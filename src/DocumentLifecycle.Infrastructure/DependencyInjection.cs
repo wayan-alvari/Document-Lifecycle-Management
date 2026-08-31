@@ -1,5 +1,10 @@
+using DocumentLifecycle.Application.Abstractions.Time;
+using DocumentLifecycle.Application.Abstractions.Workspaces;
+using DocumentLifecycle.Infrastructure.Files;
 using DocumentLifecycle.Infrastructure.Identity;
 using DocumentLifecycle.Infrastructure.Persistence;
+using DocumentLifecycle.Infrastructure.Time;
+using DocumentLifecycle.Infrastructure.Workspaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +19,24 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services
+            .AddOptions<DemoModeOptions>()
+            .Bind(configuration.GetSection(DemoModeOptions.SectionName))
+            .Validate(options => options.SeedVersion > 0, "Demo seed version must be positive.")
+            .Validate(
+                options => options.ActivityWriteIntervalMinutes > 0,
+                "Demo activity write interval must be positive.")
+            .Validate(
+                options => options.CleanupIntervalMinutes > 0,
+                "Demo cleanup interval must be positive.")
+            .Validate(options => options.CookieLifetimeDays > 0, "Demo cookie lifetime must be positive.")
+            .ValidateOnStart();
+        services
+            .AddOptions<FileStorageOptions>()
+            .Bind(configuration.GetSection(FileStorageOptions.SectionName))
+            .Validate(options => !string.IsNullOrWhiteSpace(options.RootPath), "A file storage root is required.")
+            .ValidateOnStart();
+
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             var isSqlite = string.Equals(
@@ -65,6 +88,14 @@ public static class DependencyInjection
         });
 
         services.AddScoped<DemoIdentitySeeder>();
+        services.AddSingleton<IClock, SystemClock>();
+        services.AddScoped<CurrentWorkspace>();
+        services.AddScoped<ICurrentWorkspace>(provider => provider.GetRequiredService<CurrentWorkspace>());
+        services.AddScoped<IWorkspaceSeedService, WorkspaceSeedService>();
+        services.AddScoped<IWorkspaceFileCleaner, WorkspaceFileCleaner>();
+        services.AddScoped<WorkspaceCoordinator>();
+        services.AddScoped<WorkspaceCleanupRunner>();
+        services.AddHostedService<WorkspaceCleanupHostedService>();
 
         return services;
     }
