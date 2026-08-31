@@ -9,7 +9,7 @@ public sealed class CurrentWorkspace : ICurrentWorkspace
     public Guid GetRequiredWorkspaceId() => WorkspaceId
         ?? throw new InvalidOperationException("No demo workspace is available for the current request.");
 
-    internal void Set(Guid workspaceId)
+    public void Set(Guid workspaceId)
     {
         if (workspaceId == Guid.Empty)
         {

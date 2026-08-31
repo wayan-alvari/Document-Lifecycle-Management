@@ -94,6 +94,16 @@ public sealed class WorkspaceTests
         Assert.False(await database.DemoWorkspaces.AnyAsync(workspace => workspace.Id == initialId));
         Assert.True(await database.DemoWorkspaces.AnyAsync(workspace => workspace.Id == resetId));
         Assert.Equal(1, await database.DemoWorkspaces.CountAsync());
+        Assert.False(await database.ManagedDocuments
+            .IgnoreQueryFilters()
+            .AnyAsync(document => document.WorkspaceId == initialId));
+        Assert.False(await database.DocumentRevisions
+            .IgnoreQueryFilters()
+            .AnyAsync(revision => revision.WorkspaceId == initialId));
+        Assert.False(await database.AuditEvents
+            .IgnoreQueryFilters()
+            .AnyAsync(auditEvent => auditEvent.WorkspaceId == initialId));
+        Assert.Equal(12, await database.ManagedDocuments.IgnoreQueryFilters().CountAsync());
     }
 
     [Fact]

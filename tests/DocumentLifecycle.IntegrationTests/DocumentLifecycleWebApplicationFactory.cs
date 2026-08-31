@@ -11,9 +11,13 @@ namespace DocumentLifecycle.IntegrationTests;
 
 public sealed class DocumentLifecycleWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly string databasePath = Path.Combine(
-        Path.GetTempPath(),
-        $"document-lifecycle-auth-{Guid.NewGuid():N}.db");
+    private readonly SqliteConnection databaseConnection = new(
+        $"Data Source=document-lifecycle-{Guid.NewGuid():N};Mode=Memory;Cache=Shared;Pooling=False");
+
+    public DocumentLifecycleWebApplicationFactory()
+    {
+        databaseConnection.Open();
+    }
 
     public TestClock Clock { get; } = new();
 
@@ -29,7 +33,7 @@ public sealed class DocumentLifecycleWebApplicationFactory : WebApplicationFacto
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Database:SqliteConnection"] = $"Data Source={databasePath};Pooling=False",
+                ["Database:SqliteConnection"] = databaseConnection.ConnectionString,
                 ["Database:Provider"] = "Sqlite",
                 ["DemoMode:Enabled"] = "true",
                 ["FileStorage:RootPath"] = UploadRoot,
@@ -47,10 +51,9 @@ public sealed class DocumentLifecycleWebApplicationFactory : WebApplicationFacto
     {
         base.Dispose(disposing);
 
-        if (disposing && File.Exists(databasePath))
+        if (disposing)
         {
-            SqliteConnection.ClearAllPools();
-            File.Delete(databasePath);
+            databaseConnection.Dispose();
         }
 
         if (disposing && Directory.Exists(UploadRoot))

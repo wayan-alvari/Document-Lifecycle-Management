@@ -91,6 +91,7 @@ public static class DependencyInjection
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<CurrentWorkspace>();
         services.AddScoped<ICurrentWorkspace>(provider => provider.GetRequiredService<CurrentWorkspace>());
+        services.AddSingleton<WorkspaceUploadPathResolver>();
         services.AddScoped<IWorkspaceSeedService, WorkspaceSeedService>();
         services.AddScoped<IWorkspaceFileCleaner, WorkspaceFileCleaner>();
         services.AddScoped<WorkspaceCoordinator>();
