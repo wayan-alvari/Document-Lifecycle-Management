@@ -1,5 +1,7 @@
 using DocumentLifecycle.Application.Abstractions.Time;
 using DocumentLifecycle.Application.Abstractions.Workspaces;
+using DocumentLifecycle.Application.Dashboard;
+using DocumentLifecycle.Infrastructure.Dashboard;
 using DocumentLifecycle.Infrastructure.Files;
 using DocumentLifecycle.Infrastructure.Identity;
 using DocumentLifecycle.Infrastructure.Persistence;
@@ -88,6 +90,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<DemoIdentitySeeder>();
+        services.AddScoped<IDashboardQuery, DashboardQuery>();
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<CurrentWorkspace>();
         services.AddScoped<ICurrentWorkspace>(provider => provider.GetRequiredService<CurrentWorkspace>());

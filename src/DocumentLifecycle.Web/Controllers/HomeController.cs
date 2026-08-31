@@ -1,14 +1,16 @@
+using DocumentLifecycle.Application.Dashboard;
 using DocumentLifecycle.Application.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DocumentLifecycle.Web.Controllers;
 
-public sealed class HomeController : Controller
+public sealed class HomeController(IDashboardQuery dashboardQuery) : Controller
 {
     [Authorize(Policy = AuthorizationPolicies.ViewDashboard)]
-    public IActionResult Index()
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        return View();
+        var dashboard = await dashboardQuery.GetAsync(cancellationToken);
+        return View(dashboard);
     }
 }

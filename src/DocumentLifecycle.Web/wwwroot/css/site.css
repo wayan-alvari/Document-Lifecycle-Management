@@ -139,6 +139,215 @@ a:hover {
   width: 0.65rem;
 }
 
+.dashboard-intro {
+  background: linear-gradient(120deg, #fff, #edf5ff);
+  border: 1px solid #dce5f0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.role-summary,
+.count-chip {
+  background: #eef2ff;
+  border: 1px solid #d7def8;
+  border-radius: 999px;
+  color: #28406d;
+  display: inline-flex;
+  font-size: 0.78rem;
+  padding: 0.45rem 0.7rem;
+}
+
+.metric-card {
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid #dce4ee;
+  border-radius: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  min-height: 8.2rem;
+  overflow: hidden;
+  padding: 1rem;
+  position: relative;
+}
+
+.metric-card::after {
+  background: var(--metric-color);
+  bottom: 0;
+  content: "";
+  height: 0.3rem;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.metric-total {
+  --metric-color: #2357d9;
+}
+
+.metric-draft {
+  --metric-color: #778397;
+}
+
+.metric-active {
+  --metric-color: #16816f;
+}
+
+.metric-expiring {
+  --metric-color: #c17b00;
+}
+
+.metric-expired {
+  --metric-color: #c44343;
+}
+
+.metric-archived {
+  --metric-color: #6748a5;
+}
+
+.metric-label {
+  color: var(--dl-muted);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metric-value {
+  display: block;
+  font-size: 2rem;
+  line-height: 1.1;
+  margin-top: 0.65rem;
+}
+
+.metric-mark {
+  border: 1px solid var(--metric-color);
+  border-radius: 0.45rem;
+  color: var(--metric-color);
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.2rem 0.3rem;
+}
+
+.lifecycle-chart {
+  border-radius: 1rem;
+}
+
+.chart-item {
+  font-size: 0.78rem;
+  min-width: 9rem;
+}
+
+.status-progress {
+  accent-color: var(--progress-color);
+  display: block;
+  height: 0.55rem;
+  width: 100%;
+}
+
+.progress-draft {
+  --progress-color: #778397;
+}
+
+.progress-active {
+  --progress-color: #16816f;
+}
+
+.progress-expiring {
+  --progress-color: #c17b00;
+}
+
+.progress-expired {
+  --progress-color: #c44343;
+}
+
+.progress-archived {
+  --progress-color: #6748a5;
+}
+
+.dashboard-panel {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.dashboard-table th {
+  color: var(--dl-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.8rem 1.5rem;
+  text-transform: uppercase;
+}
+
+.dashboard-table td {
+  padding: 1rem 1.5rem;
+}
+
+.document-code {
+  color: var(--dl-primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.due-label {
+  color: #915b00;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.activity-list li {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: auto 1fr;
+  padding: 0 0 1rem;
+  position: relative;
+}
+
+.activity-list li:not(:last-child)::before {
+  background: #dce4ee;
+  content: "";
+  height: 100%;
+  left: 0.3rem;
+  position: absolute;
+  top: 0.65rem;
+  width: 1px;
+}
+
+.activity-marker {
+  background: var(--dl-primary);
+  border: 3px solid #dfe8ff;
+  border-radius: 50%;
+  height: 0.7rem;
+  margin-top: 0.25rem;
+  position: relative;
+  width: 0.7rem;
+  z-index: 1;
+}
+
+.activity-time {
+  color: var(--dl-muted);
+  display: block;
+  font-size: 0.7rem;
+  margin-top: 0.15rem;
+}
+
+.empty-state {
+  align-items: flex-start;
+  background: #f6f8fb;
+  border: 1px dashed #c9d4e2;
+  border-radius: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.empty-state span {
+  color: var(--dl-muted);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
 .account-page {
   background-image:
     radial-gradient(circle at 8% 8%, rgb(35 87 217 / 12%), transparent 30rem),
@@ -210,6 +419,19 @@ a:hover {
   }
 
   .account-page .container {
+    padding-inline: 1rem;
+  }
+
+  .metric-card {
+    min-height: 7rem;
+  }
+
+  .metric-value {
+    font-size: 1.7rem;
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
     padding-inline: 1rem;
   }
 }

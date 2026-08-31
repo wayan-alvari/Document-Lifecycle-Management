@@ -1,22 +1,160 @@
-﻿@{
-    ViewData["Title"] = "Portfolio overview";
+@model DocumentLifecycle.Application.Dashboard.DashboardSnapshot
+@{
+    ViewData["Title"] = "Lifecycle dashboard";
+    var metrics = new[]
+    {
+        (Label: "Total", Value: Model.Total, Tone: "total", Mark: "ALL"),
+        (Label: "Draft", Value: Model.Draft, Tone: "draft", Mark: "DR"),
+        (Label: "Active", Value: Model.Active, Tone: "active", Mark: "AC"),
+        (Label: "Expiring soon", Value: Model.ExpiringSoon, Tone: "expiring", Mark: "30D"),
+        (Label: "Expired", Value: Model.Expired, Tone: "expired", Mark: "EX"),
+        (Label: "Archived", Value: Model.Archived, Tone: "archived", Mark: "AR"),
+    };
 }
 
-<section class="card border-0 shadow-sm">
-    <div class="card-body p-4 p-lg-5">
-        <span class="eyebrow">Authenticated demo</span>
-        <h2 class="mt-2">Document lifecycle workspace</h2>
-        <p class="lead mb-4">
-            The role-based shell is ready. Dashboard metrics and document workflow
-            modules are added in the next focused milestones.
-        </p>
-        <dl class="row mb-0">
-            <dt class="col-sm-4">Signed in as</dt>
-            <dd class="col-sm-8">@User.Identity?.Name</dd>
-            <dt class="col-sm-4">Available role</dt>
-            <dd class="col-sm-8">
-                @string.Join(", ", ApplicationRoles.All.Where(User.IsInRole))
-            </dd>
-        </dl>
+<section class="dashboard-intro d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
+    <div>
+        <span class="eyebrow">Workspace snapshot</span>
+        <h2 class="h4 mt-2 mb-1">Lifecycle at a glance</h2>
+        <p class="text-body-secondary mb-0">Track drafts, review dates, and recent workflow activity in this browser's private demo data.</p>
+    </div>
+    <span class="role-summary">Signed in as <strong>@User.Identity?.Name</strong></span>
+</section>
+
+<section aria-labelledby="lifecycle-metrics-heading">
+    <h2 class="visually-hidden" id="lifecycle-metrics-heading">Lifecycle metrics</h2>
+    <div class="row g-3 mb-4">
+        @foreach (var metric in metrics)
+        {
+            <div class="col-6 col-lg-4 col-xxl-2">
+                <article class="metric-card metric-@metric.Tone h-100">
+                    <div>
+                        <span class="metric-label">@metric.Label</span>
+                        <strong class="metric-value">@metric.Value</strong>
+                    </div>
+                    <span class="metric-mark" aria-hidden="true">@metric.Mark</span>
+                </article>
+            </div>
+        }
     </div>
 </section>
+
+<section class="card lifecycle-chart border-0 shadow-sm mb-4" aria-labelledby="distribution-heading">
+    <div class="card-body p-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+            <div>
+                <span class="eyebrow">Current distribution</span>
+                <h2 class="h5 mt-2 mb-0" id="distribution-heading">Documents by lifecycle status</h2>
+            </div>
+            <span class="small text-body-secondary">Derived from today's UTC date</span>
+        </div>
+        <div class="row g-3">
+            @foreach (var metric in metrics.Skip(1))
+            {
+                <div class="col-md chart-item">
+                    <div class="d-flex justify-content-between gap-2 mb-1">
+                        <span>@metric.Label</span>
+                        <strong>@metric.Value</strong>
+                    </div>
+                    <progress class="status-progress progress-@metric.Tone" max="@Math.Max(Model.Total, 1)" value="@metric.Value">@metric.Value of @Model.Total</progress>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <section class="col-xl-7" aria-labelledby="expiry-heading">
+        <div class="card dashboard-panel border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 d-flex align-items-start justify-content-between gap-3 p-4 pb-2">
+                <div>
+                    <span class="eyebrow">Next 30 days</span>
+                    <h2 class="h5 mt-2 mb-0" id="expiry-heading">Documents approaching review</h2>
+                </div>
+                <span class="count-chip">@Model.ExpiringDocuments.Count due</span>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.ExpiringDocuments.Count == 0)
+                {
+                    <div class="empty-state m-4">
+                        <strong>No upcoming review dates</strong>
+                        <span>Active documents due within 30 days will appear here.</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table dashboard-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Document</th>
+                                    <th scope="col">Owner</th>
+                                    <th scope="col">Review date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var document in Model.ExpiringDocuments)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="document-code">@document.Code</span>
+                                            <strong class="d-block">@document.Title</strong>
+                                            <span class="small text-body-secondary">@document.Category</span>
+                                        </td>
+                                        <td>@document.Owner</td>
+                                        <td>
+                                            <time datetime="@document.ExpiryDate.ToString("yyyy-MM-dd")">@document.ExpiryDate.ToString("dd MMM yyyy")</time>
+                                            <span class="due-label d-block">@(document.DaysRemaining == 0 ? "Due today" : $"{document.DaysRemaining} days left")</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="col-xl-5" aria-labelledby="activity-heading">
+        <div class="card dashboard-panel border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 p-4 pb-2">
+                <span class="eyebrow">Audit trail</span>
+                <h2 class="h5 mt-2 mb-0" id="activity-heading">Recent activity</h2>
+            </div>
+            <div class="card-body p-4 pt-3">
+                @if (Model.RecentActivity.Count == 0)
+                {
+                    <div class="empty-state">
+                        <strong>No activity yet</strong>
+                        <span>Workflow actions will appear here.</span>
+                    </div>
+                }
+                else
+                {
+                    <ol class="activity-list list-unstyled mb-0">
+                        @foreach (var activity in Model.RecentActivity)
+                        {
+                            <li>
+                                <span class="activity-marker" aria-hidden="true"></span>
+                                <div>
+                                    <strong>@Humanize(activity.Action)</strong>
+                                    <span class="d-block small text-body-secondary">@activity.Actor</span>
+                                    <time class="activity-time" datetime="@activity.OccurredAtUtc.ToString("O")">@activity.OccurredAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'")</time>
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@functions {
+    private static string Humanize(string value) => value switch
+    {
+        "RevisionUploaded" => "Revision uploaded",
+        _ => value,
+    };
+}
