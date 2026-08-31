@@ -46,7 +46,28 @@ CodeCoverage/
 .vs/
 .vscode/
 .codex*/
-Docs/
+
+# Repository-local SDK and package-manager output
+.dotnet/
+node_modules/
+
+# Generated frontend assets
+src/DocumentLifecycle.Web/wwwroot/vendor/
+
+# Local application data and publish output
+uploads/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+publish/
+.publish/
+
+# Local coverage output
+coverage/
+*.coverage
+*.coveragexml
 
 # MSBuild Binary and Structured Log
 *.binlog
