@@ -1,8 +1,22 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Portfolio overview";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="card border-0 shadow-sm">
+    <div class="card-body p-4 p-lg-5">
+        <span class="eyebrow">Authenticated demo</span>
+        <h2 class="mt-2">Document lifecycle workspace</h2>
+        <p class="lead mb-4">
+            The role-based shell is ready. Dashboard metrics and document workflow
+            modules are added in the next focused milestones.
+        </p>
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Signed in as</dt>
+            <dd class="col-sm-8">@User.Identity?.Name</dd>
+            <dt class="col-sm-4">Available role</dt>
+            <dd class="col-sm-8">
+                @string.Join(", ", ApplicationRoles.All.Where(User.IsInRole))
+            </dd>
+        </dl>
+    </div>
+</section>

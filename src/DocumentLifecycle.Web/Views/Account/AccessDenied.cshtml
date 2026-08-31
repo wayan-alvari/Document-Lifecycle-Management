@@ -1,0 +1,25 @@
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Access denied";
+}
+
+<section class="status-card card border-0 shadow-sm mx-auto text-center">
+    <div class="card-body p-5">
+        <span class="status-code" aria-hidden="true">403</span>
+        <h1 class="h2">Access denied</h1>
+        <p class="text-body-secondary">Your current demo role is signed in, but it is not allowed to perform this action.</p>
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Return to workspace</a>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button class="btn btn-outline-primary" type="submit">Sign out &amp; switch role</button>
+                </form>
+            }
+            else
+            {
+                <a class="btn btn-primary" asp-controller="Account" asp-action="Login">Return to sign in</a>
+            }
+        </div>
+    </div>
+</section>

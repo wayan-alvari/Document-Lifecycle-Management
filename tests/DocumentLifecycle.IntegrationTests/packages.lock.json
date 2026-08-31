@@ -1486,6 +1486,7 @@
           "DocumentLifecycle.Application": "[1.0.0, )",
           "DocumentLifecycle.Domain": "[1.0.0, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[8.0.30, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[8.0.30, )",
           "Pomelo.EntityFrameworkCore.MySql": "[8.0.3, )"
         }
       },

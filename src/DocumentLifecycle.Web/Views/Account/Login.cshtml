@@ -1,0 +1,83 @@
+@model DocumentLifecycle.Web.ViewModels.Account.LoginViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Demo sign in";
+}
+
+<div class="account-shell mx-auto">
+    <header class="text-center mb-4">
+        <span class="brand-mark brand-mark-large" aria-hidden="true">DL</span>
+        <p class="eyebrow mt-3 mb-1">Independent portfolio application</p>
+        <h1 class="display-6 fw-semibold">Document Lifecycle Management</h1>
+        <p class="lead text-body-secondary">
+            Explore how fictional documents move from draft through active use,
+            revision, expiry, and archive.
+        </p>
+    </header>
+
+    @if (ViewData["Switched"] as bool? == true)
+    {
+        <div class="alert alert-success" role="status">You are signed out. Choose another demo role below.</div>
+    }
+
+    <div class="alert reset-notice text-center" role="status">
+        <strong>Demo data is isolated per browser and automatically resets after 6 hours of inactivity.</strong>
+    </div>
+
+    <div class="row g-4 align-items-stretch">
+        <div class="col-lg-5">
+            <section class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h2 class="h4">Sign in</h2>
+                    <p class="text-body-secondary">Use any public demo account. Authentication is real and role policies are enforced server-side.</p>
+                    <form asp-action="Login" method="post" data-disable-on-submit>
+                        <input asp-for="ReturnUrl" type="hidden" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" autocomplete="username" autofocus />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit" data-submit-label="Signing in…">Sign in to workspace</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-7">
+            <section class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h2 class="h4">Demo accounts</h2>
+                    <p class="text-body-secondary">Select an account to fill the sign-in form. Every account uses the displayed portfolio-only password.</p>
+                    <div class="vstack gap-3">
+                        @foreach (var account in DemoAccounts.All)
+                        {
+                            <button type="button"
+                                    class="demo-account text-start"
+                                    data-demo-email="@account.Email"
+                                    data-demo-password="@account.Password">
+                                <span class="d-flex justify-content-between gap-3">
+                                    <strong>@account.Role</strong>
+                                    <span class="role-chip">Use account</span>
+                                </span>
+                                <span class="d-block mt-2"><code>@account.Email</code></span>
+                                <span class="d-block"><code>@account.Password</code></span>
+                                <small class="d-block text-body-secondary mt-2">@account.Capability</small>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <p class="clean-room-note text-center mt-4 mb-0">
+        Built from scratch with generic document-lifecycle concepts. No employer
+        source code, confidential data, proprietary branding, or copied business
+        assets are included.
+    </p>
+</div>

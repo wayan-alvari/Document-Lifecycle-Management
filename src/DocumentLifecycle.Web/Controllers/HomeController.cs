@@ -1,31 +1,14 @@
-using System.Diagnostics;
+using DocumentLifecycle.Application.Security;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DocumentLifecycle.Web.Models;
 
 namespace DocumentLifecycle.Web.Controllers;
 
-public class HomeController : Controller
+public sealed class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
+    [Authorize(Policy = AuthorizationPolicies.ViewDashboard)]
     public IActionResult Index()
     {
         return View();
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

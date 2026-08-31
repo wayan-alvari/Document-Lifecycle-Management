@@ -5,6 +5,13 @@
     <ProjectReference Include="..\DocumentLifecycle.Infrastructure\DocumentLifecycle.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <PropertyGroup>
     <UserSecretsId>DocumentLifecycle.Web-Portfolio-2026</UserSecretsId>
     <FrontendRoot>$(MSBuildProjectDirectory)\..\..\</FrontendRoot>
