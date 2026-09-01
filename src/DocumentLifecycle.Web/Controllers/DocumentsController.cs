@@ -1,6 +1,7 @@
 using DocumentLifecycle.Application.Abstractions.Time;
 using DocumentLifecycle.Application.Documents;
 using DocumentLifecycle.Application.Files;
+using DocumentLifecycle.Application.Reports;
 using DocumentLifecycle.Application.Security;
 using DocumentLifecycle.Domain.Documents;
 using DocumentLifecycle.Web.ViewModels.Documents;
@@ -13,6 +14,7 @@ namespace DocumentLifecycle.Web.Controllers;
 public sealed class DocumentsController(
     IDocumentService documents,
     IDocumentFileService documentFiles,
+    IDocumentReportService reports,
     IClock clock) : Controller
 {
     [HttpGet]
@@ -36,6 +38,31 @@ public sealed class DocumentsController(
 
         ViewData["CanManageDocuments"] = CanManage;
         return View(document);
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ExportDocuments)]
+    [HttpGet]
+    public async Task<IActionResult> Export(
+        [FromQuery] DocumentListQueryViewModel query,
+        CancellationToken cancellationToken)
+    {
+        var report = await reports.ExportListAsync(query.ToFilter(), CanManage, cancellationToken);
+        SetReportHeaders();
+        return File(report.Content, report.ContentType, report.DownloadFilename);
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ExportDocuments)]
+    [HttpGet]
+    public async Task<IActionResult> SummaryPdf(Guid id, CancellationToken cancellationToken)
+    {
+        var report = await reports.CreateSummaryAsync(id, CanManage, cancellationToken);
+        if (report is null)
+        {
+            return NotFound();
+        }
+
+        SetReportHeaders();
+        return File(report.Content, report.ContentType, report.DownloadFilename);
     }
 
     [Authorize(Policy = AuthorizationPolicies.ManageDocuments)]
@@ -322,4 +349,10 @@ public sealed class DocumentsController(
         User.IsInRole(ApplicationRoles.DocumentManager);
 
     private string Actor => User.Identity?.Name ?? "demo-user";
+
+    private void SetReportHeaders()
+    {
+        Response.Headers.XContentTypeOptions = "nosniff";
+        Response.Headers.CacheControl = "private, no-store";
+    }
 }

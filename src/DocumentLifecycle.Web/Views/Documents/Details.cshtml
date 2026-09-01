@@ -12,29 +12,28 @@
         <h2 class="h3 mt-1 mb-2">@Model.Title</h2>
         <span class="status-badge status-@StatusClass(Model.DisplayStatus)">@StatusLabel(Model.DisplayStatus)</span>
     </div>
-    @if (canManage && Model.State == LifecycleState.Draft)
-    {
-        <div class="d-flex flex-wrap gap-2">
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="SummaryPdf" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Download PDF summary</a>
+        @if (canManage && Model.State == LifecycleState.Draft)
+        {
             <a asp-action="Edit" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Edit metadata</a>
             <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Upload revision</a>
             <form asp-action="Activate" asp-route-id="@Model.PublicId" method="post">
                 <button type="submit" class="btn btn-primary" disabled="@(Model.Revisions.Count == 0)">Activate</button>
             </form>
-        </div>
-    }
-    else if (canManage && Model.State == LifecycleState.Active)
-    {
-        <div class="d-flex flex-wrap gap-2">
+        }
+        else if (canManage && Model.State == LifecycleState.Active)
+        {
             <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-primary">Upload revision</a>
             <a asp-action="Archive" asp-route-id="@Model.PublicId" class="btn btn-outline-danger">Archive</a>
-        </div>
-    }
-    else if (canManage && Model.State == LifecycleState.Archived)
-    {
-        <form asp-action="Restore" asp-route-id="@Model.PublicId" method="post">
-            <button type="submit" class="btn btn-primary">Restore to active</button>
-        </form>
-    }
+        }
+        else if (canManage && Model.State == LifecycleState.Archived)
+        {
+            <form asp-action="Restore" asp-route-id="@Model.PublicId" method="post">
+                <button type="submit" class="btn btn-primary">Restore to active</button>
+            </form>
+        }
+    </div>
 </div>
 
 @if (Model.State == LifecycleState.Draft && Model.Revisions.Count == 0)

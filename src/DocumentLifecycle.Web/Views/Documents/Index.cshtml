@@ -10,10 +10,20 @@
         <h2 class="h4 mt-2 mb-1">Documents</h2>
         <p class="text-body-secondary mb-0">Search and filter this browser's workspace using server-side queries.</p>
     </div>
-    @if (Model.CanManageDocuments)
-    {
-        <a asp-action="Create" class="btn btn-primary">Create draft</a>
-    }
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="Export"
+           asp-route-Search="@Model.Query.Search"
+           asp-route-Status="@Model.Query.Status"
+           asp-route-CategoryId="@Model.Query.CategoryId"
+           asp-route-OwnerId="@Model.Query.OwnerId"
+           asp-route-ExpiryFrom="@Model.Query.ExpiryFrom"
+           asp-route-ExpiryTo="@Model.Query.ExpiryTo"
+           class="btn btn-outline-primary">Export XLSX</a>
+        @if (Model.CanManageDocuments)
+        {
+            <a asp-action="Create" class="btn btn-primary">Create draft</a>
+        }
+    </div>
 </div>
 
 <section class="card filter-card border-0 shadow-sm mb-4" aria-labelledby="filter-heading">
