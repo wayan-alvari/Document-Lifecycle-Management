@@ -2,12 +2,21 @@ using DocumentLifecycle.Infrastructure;
 using DocumentLifecycle.Web;
 using DocumentLifecycle.Web.Middleware;
 using DocumentLifecycle.Web.Workspaces;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
-var builder = WebApplication.CreateBuilder(args);
+var initializeDemo = args.Any(argument => string.Equals(
+    argument,
+    "--initialize-demo",
+    StringComparison.OrdinalIgnoreCase));
+var applicationArguments = args
+    .Where(argument => !string.Equals(argument, "--initialize-demo", StringComparison.OrdinalIgnoreCase))
+    .ToArray();
+var builder = WebApplication.CreateBuilder(applicationArguments);
 
 builder.Services.AddControllersWithViews(options =>
 {
@@ -17,6 +26,19 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationAuthorization();
 builder.Services.AddSingleton<WorkspaceCookieService>();
+var dataProtection = builder.Services
+    .AddDataProtection()
+    .SetApplicationName("DocumentLifecycleManagement");
+var dataProtectionKeyPath = builder.Configuration["DataProtection:KeyPath"];
+if (!string.IsNullOrWhiteSpace(dataProtectionKeyPath))
+{
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(Path.GetFullPath(dataProtectionKeyPath)));
+}
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 builder.Services.Configure<FormOptions>(options =>
 {
     options.ValueCountLimit = 200;
@@ -58,8 +80,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
+if (initializeDemo)
+{
+    await app.InitializeDemoIdentityAsync(explicitlyRequested: true);
+    return;
+}
+
 await app.InitializeDemoIdentityAsync();
 
+app.UseForwardedHeaders();
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseExceptionHandler("/Home/Error");
 app.UseStatusCodePagesWithReExecute("/Home/StatusPage", "?code={0}");

@@ -6,10 +6,24 @@ namespace DocumentLifecycle.Web;
 
 internal static class DemoIdentityInitialization
 {
-    public static async Task InitializeDemoIdentityAsync(this WebApplication app)
+    public static async Task InitializeDemoIdentityAsync(
+        this WebApplication app,
+        bool explicitlyRequested = false)
     {
-        if (!app.Configuration.GetValue<bool>("DemoMode:Enabled") ||
-            (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing")))
+        if (!app.Configuration.GetValue<bool>("DemoMode:Enabled"))
+        {
+            if (explicitlyRequested)
+            {
+                throw new InvalidOperationException(
+                    "Explicit demo initialization requires DemoMode:Enabled=true.");
+            }
+
+            return;
+        }
+
+        if (!explicitlyRequested &&
+            !app.Environment.IsDevelopment() &&
+            !app.Environment.IsEnvironment("Testing"))
         {
             return;
         }
@@ -17,7 +31,7 @@ internal static class DemoIdentityInitialization
         await using var scope = app.Services.CreateAsyncScope();
         var database = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        if (app.Environment.IsEnvironment("Testing"))
+        if (database.Database.IsSqlite())
         {
             await database.Database.EnsureCreatedAsync();
         }
@@ -28,5 +42,9 @@ internal static class DemoIdentityInitialization
 
         var seeder = scope.ServiceProvider.GetRequiredService<DemoIdentitySeeder>();
         await seeder.SeedAsync();
+        app.Logger.LogInformation(
+            explicitlyRequested
+                ? "Explicit demo database initialization completed."
+                : "Development demo database initialization completed.");
     }
 }

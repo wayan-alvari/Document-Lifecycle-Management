@@ -11,6 +11,18 @@ namespace DocumentLifecycle.IntegrationTests;
 public sealed class HardeningTests
 {
     [Fact]
+    public async Task DevelopmentSqliteQuickStartCreatesSchema()
+    {
+        await using var factory = new DocumentLifecycleWebApplicationFactory("Development");
+        using var client = CreateClient(factory);
+
+        var response = await client.GetAsync("/Account/Login");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("manager@documents.demo", await response.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
     public async Task SecurityHeadersProtectDynamicStaticAndHealthResponses()
     {
         await using var factory = new DocumentLifecycleWebApplicationFactory();

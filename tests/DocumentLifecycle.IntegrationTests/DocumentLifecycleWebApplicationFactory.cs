@@ -11,11 +11,18 @@ namespace DocumentLifecycle.IntegrationTests;
 
 public sealed class DocumentLifecycleWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private readonly string environment;
     private readonly SqliteConnection databaseConnection = new(
         $"Data Source=document-lifecycle-{Guid.NewGuid():N};Mode=Memory;Cache=Shared;Pooling=False");
 
     public DocumentLifecycleWebApplicationFactory()
+        : this("Testing")
     {
+    }
+
+    internal DocumentLifecycleWebApplicationFactory(string environment)
+    {
+        this.environment = environment;
         databaseConnection.Open();
     }
 
@@ -27,7 +34,7 @@ public sealed class DocumentLifecycleWebApplicationFactory : WebApplicationFacto
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(environment);
 
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
