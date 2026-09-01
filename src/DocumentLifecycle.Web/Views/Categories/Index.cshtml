@@ -1,0 +1,70 @@
+@model IReadOnlyList<DocumentLifecycle.Application.ReferenceData.CategoryListItem>
+@{
+    ViewData["Title"] = "Document categories";
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <span class="eyebrow">Configuration</span>
+        <h2 class="h4 mt-2 mb-1">Categories</h2>
+        <p class="text-body-secondary mb-0">Organize documents with workspace-specific reference data.</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">Add category</a>
+</div>
+
+<section class="card settings-card border-0 shadow-sm" aria-labelledby="category-list-heading">
+    <div class="card-header bg-white border-0 p-4 pb-2">
+        <h2 class="h5 mb-0" id="category-list-heading">Available categories</h2>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Count == 0)
+        {
+            <div class="empty-state m-4">
+                <strong>No categories configured</strong>
+                <span>Add a category before creating a document.</span>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table settings-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Documents</th>
+                            <th scope="col"><span class="visually-hidden">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@category.Name</strong>
+                                    <span class="d-block small text-body-secondary">@category.Description</span>
+                                </td>
+                                <td><span class="status-pill @(category.IsActive ? "status-enabled" : "status-disabled")">@(category.IsActive ? "Active" : "Inactive")</span></td>
+                                <td>@category.DocumentCount</td>
+                                <td class="text-end text-nowrap">
+                                    <a asp-action="Edit" asp-route-id="@category.PublicId" class="btn btn-outline-primary btn-sm">Edit</a>
+                                    <form asp-action="Toggle" asp-route-id="@category.PublicId" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm">@(category.IsActive ? "Deactivate" : "Reactivate")</button>
+                                    </form>
+                                    @if (category.DocumentCount == 0)
+                                    {
+                                        <a asp-action="Delete" asp-route-id="@category.PublicId" class="btn btn-outline-danger btn-sm">Delete</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="small text-body-secondary ms-1" title="Referenced categories cannot be deleted">In use</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>

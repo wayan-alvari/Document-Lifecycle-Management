@@ -1,0 +1,33 @@
+@model DocumentLifecycle.Web.ViewModels.ReferenceData.OwnerFormViewModel
+@{
+    ViewData["Title"] = "Add owner";
+}
+
+<div class="form-shell">
+    <a asp-action="Index" class="back-link">&larr; Back to owners</a>
+    <section class="card settings-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow">Configuration</span>
+            <h2 class="h4 mt-2">Add a document owner</h2>
+            <p class="text-body-secondary">Use only fictional team details in this public portfolio demo.</p>
+            <form asp-action="Create" method="post" data-disable-on-submit>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div class="mb-3">
+                    <label asp-for="DisplayName" class="form-label"></label>
+                    <input asp-for="DisplayName" class="form-control" autocomplete="off" autofocus />
+                    <span asp-validation-for="DisplayName" class="text-danger"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Contact" class="form-label"></label>
+                    <input asp-for="Contact" class="form-control" autocomplete="off" />
+                    <div class="form-text">A fictional email address or team label.</div>
+                    <span asp-validation-for="Contact" class="text-danger"></span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary" data-submit-label="Creating...">Create owner</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

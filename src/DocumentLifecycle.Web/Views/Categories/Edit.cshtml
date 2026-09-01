@@ -1,0 +1,33 @@
+@model DocumentLifecycle.Web.ViewModels.ReferenceData.CategoryFormViewModel
+@{
+    ViewData["Title"] = "Edit category";
+    var publicId = (Guid)(ViewData["PublicId"] ?? Guid.Empty);
+}
+
+<div class="form-shell">
+    <a asp-action="Index" class="back-link">&larr; Back to categories</a>
+    <section class="card settings-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow">Configuration</span>
+            <h2 class="h4 mt-2">Edit category</h2>
+            <p class="text-body-secondary">Existing documents retain this category when its details change.</p>
+            <form asp-action="Edit" asp-route-id="@publicId" method="post" data-disable-on-submit>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" autocomplete="off" autofocus />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary" data-submit-label="Saving...">Save category</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

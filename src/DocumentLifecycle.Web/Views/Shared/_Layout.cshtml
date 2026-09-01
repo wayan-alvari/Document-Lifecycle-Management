@@ -1,6 +1,11 @@
 @{
     var pageTitle = ViewData["Title"]?.ToString() ?? "Workspace";
     var currentRole = ApplicationRoles.All.FirstOrDefault(User.IsInRole) ?? "Demo user";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    string NavClass(string controller) => string.Equals(
+        currentController,
+        controller,
+        StringComparison.OrdinalIgnoreCase) ? "nav-link active" : "nav-link";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -47,11 +52,27 @@
                 <nav class="mt-3">
                     <ul class="nav sidebar-menu flex-column" role="menu">
                         <li class="nav-item">
-                            <a asp-controller="Home" asp-action="Index" class="nav-link active" aria-current="page">
+                            <a asp-controller="Home" asp-action="Index" class="@NavClass("Home")">
                                 <span class="nav-icon" aria-hidden="true">01</span>
                                 <p>Lifecycle dashboard</p>
                             </a>
                         </li>
+                        @if (User.IsInRole(ApplicationRoles.Administrator))
+                        {
+                            <li class="nav-header">Configuration</li>
+                            <li class="nav-item">
+                                <a asp-controller="Categories" asp-action="Index" class="@NavClass("Categories")">
+                                    <span class="nav-icon" aria-hidden="true">CT</span>
+                                    <p>Categories</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Owners" asp-action="Index" class="@NavClass("Owners")">
+                                    <span class="nav-icon" aria-hidden="true">OW</span>
+                                    <p>Owners</p>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </nav>
                 <div class="sidebar-note mx-3 mt-4 p-3 rounded-3">
@@ -87,6 +108,14 @@
                             <div>Demo data is isolated per browser and automatically resets after 6 hours of inactivity.</div>
                         </div>
                     </div>
+                    @if (TempData["StatusMessage"] is string statusMessage)
+                    {
+                        <div class="alert alert-success" role="status">@statusMessage</div>
+                    }
+                    @if (TempData["ErrorMessage"] is string errorMessage)
+                    {
+                        <div class="alert alert-danger" role="alert">@errorMessage</div>
+                    }
                     @RenderBody()
                 </div>
             </div>

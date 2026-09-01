@@ -1,0 +1,28 @@
+@model DocumentLifecycle.Application.ReferenceData.CategoryDetails
+@{
+    ViewData["Title"] = "Delete category";
+}
+
+<div class="form-shell">
+    <a asp-action="Index" class="back-link">&larr; Back to categories</a>
+    <section class="card settings-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow text-danger">Permanent action</span>
+            <h2 class="h4 mt-2">Delete @Model.Name?</h2>
+            @if (Model.DocumentCount > 0)
+            {
+                <div class="alert alert-warning" role="alert">
+                    This category is used by @Model.DocumentCount document(s) and cannot be deleted. Deactivate it instead.
+                </div>
+            }
+            else
+            {
+                <p class="text-body-secondary">This unused category can be deleted. This action cannot be undone.</p>
+                <form asp-action="Delete" asp-route-id="@Model.PublicId" method="post" data-disable-on-submit>
+                    <button type="submit" class="btn btn-danger" data-submit-label="Deleting...">Delete category</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            }
+        </div>
+    </section>
+</div>
