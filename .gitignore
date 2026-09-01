@@ -47,6 +47,10 @@ CodeCoverage/
 .vscode/
 .codex*/
 
+# Local Codex build contract (never publish); other project docs remain trackable
+/docs/Guide.md
+/docs/Prompt.md
+
 # Repository-local SDK and package-manager output
 .dotnet/
 node_modules/
