@@ -1,4 +1,5 @@
 using DocumentLifecycle.Application.Abstractions.Time;
+using DocumentLifecycle.Application.Abstractions.Workspaces;
 using DocumentLifecycle.Infrastructure.Workspaces;
 using Microsoft.Extensions.Options;
 
@@ -10,10 +11,17 @@ internal sealed class DemoWorkspaceMiddleware(RequestDelegate next, IWebHostEnvi
         HttpContext context,
         WorkspaceCookieService cookieService,
         WorkspaceCoordinator coordinator,
+        ICurrentWorkspace currentWorkspace,
         IClock clock,
         IOptions<DemoModeOptions> options)
     {
         if (!options.Value.Enabled || IsIgnoredPath(context.Request.Path))
+        {
+            await next(context);
+            return;
+        }
+
+        if (currentWorkspace.WorkspaceId is not null)
         {
             await next(context);
             return;

@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="account-page bg-body-tertiary">
-    <main class="container py-4 py-lg-5" role="main">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <main class="container py-4 py-lg-5" id="main-content" tabindex="-1">
         @RenderBody()
     </main>
     <script src="~/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>

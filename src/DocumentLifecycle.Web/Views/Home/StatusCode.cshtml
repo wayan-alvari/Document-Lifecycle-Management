@@ -1,0 +1,14 @@
+@model DocumentLifecycle.Web.Models.StatusCodeViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="status-card card border-0 shadow-sm mx-auto text-center" aria-labelledby="status-heading">
+    <div class="card-body p-5">
+        <span class="status-code" aria-hidden="true">@Model.StatusCode</span>
+        <h1 class="h2" id="status-heading">@Model.Title</h1>
+        <p class="text-body-secondary">@Model.Message</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Return to workspace</a>
+    </div>
+</section>

@@ -12,8 +12,8 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Return to workspace</a>
-                <form asp-controller="Account" asp-action="Logout" method="post">
-                    <button class="btn btn-outline-primary" type="submit">Sign out &amp; switch role</button>
+                <form asp-controller="Account" asp-action="Logout" method="post" data-disable-on-submit>
+                    <button class="btn btn-outline-primary" type="submit" data-submit-label="Signing out...">Sign out &amp; switch role</button>
                 </form>
             }
             else

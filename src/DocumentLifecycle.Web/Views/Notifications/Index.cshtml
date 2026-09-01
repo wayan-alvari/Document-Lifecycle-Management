@@ -11,8 +11,8 @@
     </div>
     @if (Model.UnreadCount > 0)
     {
-        <form asp-action="MarkAllRead" method="post">
-            <button type="submit" class="btn btn-outline-primary">Mark all as read</button>
+        <form asp-action="MarkAllRead" method="post" data-disable-on-submit>
+            <button type="submit" class="btn btn-outline-primary" data-submit-label="Marking as read...">Mark all as read</button>
         </form>
     }
 </div>
@@ -44,8 +44,8 @@
                                 <a href="@notification.Link" class="btn btn-outline-primary btn-sm">Open document</a>
                                 @if (notification.ReadAtUtc is null)
                                 {
-                                    <form asp-action="MarkRead" asp-route-id="@notification.PublicId" method="post">
-                                        <button type="submit" class="btn btn-outline-secondary btn-sm">Mark as read</button>
+                                    <form asp-action="MarkRead" asp-route-id="@notification.PublicId" method="post" data-disable-on-submit>
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" data-submit-label="Marking...">Mark as read</button>
                                     </form>
                                 }
                                 else

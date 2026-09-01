@@ -23,7 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      form.setAttribute("aria-busy", "true");
       submitButton.disabled = true;
+      submitButton.setAttribute("aria-disabled", "true");
       submitButton.textContent = submitButton.dataset.submitLabel ?? "Working…";
     });
   });

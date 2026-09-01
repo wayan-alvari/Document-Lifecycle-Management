@@ -6,6 +6,10 @@
         currentController,
         controller,
         StringComparison.OrdinalIgnoreCase) ? "nav-link active" : "nav-link";
+    string? NavCurrent(string controller) => string.Equals(
+        currentController,
+        controller,
+        StringComparison.OrdinalIgnoreCase) ? "page" : null;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -18,12 +22,13 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="app-wrapper">
         <nav class="app-header navbar navbar-expand bg-white border-bottom" aria-label="Application header">
             <div class="container-fluid">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <button class="nav-link" type="button" data-lte-toggle="sidebar" aria-label="Toggle navigation">
+                        <button class="nav-link" type="button" data-lte-toggle="sidebar" aria-controls="primary-sidebar" aria-label="Toggle navigation">
                             <span class="menu-glyph" aria-hidden="true">☰</span>
                         </button>
                     </li>
@@ -36,15 +41,15 @@
                         <span class="navbar-text text-body-secondary">@User.Identity?.Name · @currentRole</span>
                     </li>
                     <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="post">
-                            <button class="btn btn-outline-primary btn-sm" type="submit">Sign out &amp; switch role</button>
+                        <form asp-controller="Account" asp-action="Logout" method="post" data-disable-on-submit>
+                            <button class="btn btn-outline-primary btn-sm" type="submit" data-submit-label="Signing out...">Sign out &amp; switch role</button>
                         </form>
                     </li>
                 </ul>
             </div>
         </nav>
 
-        <aside class="app-sidebar bg-dark shadow" data-bs-theme="dark" aria-label="Primary navigation">
+        <aside class="app-sidebar bg-dark shadow" id="primary-sidebar" data-bs-theme="dark" aria-label="Primary navigation">
             <div class="sidebar-brand">
                 <a asp-controller="Home" asp-action="Index" class="brand-link text-decoration-none">
                     <span class="brand-mark" aria-hidden="true">DL</span>
@@ -53,21 +58,21 @@
             </div>
             <div class="sidebar-wrapper">
                 <nav class="mt-3">
-                    <ul class="nav sidebar-menu flex-column" role="menu">
+                    <ul class="nav sidebar-menu flex-column">
                         <li class="nav-item">
-                            <a asp-controller="Home" asp-action="Index" class="@NavClass("Home")">
+                            <a asp-controller="Home" asp-action="Index" class="@NavClass("Home")" aria-current="@NavCurrent("Home")">
                                 <span class="nav-icon" aria-hidden="true">01</span>
                                 <p>Lifecycle dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Documents" asp-action="Index" class="@NavClass("Documents")">
+                            <a asp-controller="Documents" asp-action="Index" class="@NavClass("Documents")" aria-current="@NavCurrent("Documents")">
                                 <span class="nav-icon" aria-hidden="true">DC</span>
                                 <p>Documents</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Notifications" asp-action="Index" class="@NavClass("Notifications")">
+                            <a asp-controller="Notifications" asp-action="Index" class="@NavClass("Notifications")" aria-current="@NavCurrent("Notifications")">
                                 <span class="nav-icon" aria-hidden="true">AL</span>
                                 <p>Notifications</p>
                             </a>
@@ -75,7 +80,7 @@
                         @if (User.IsInRole(ApplicationRoles.Administrator) || User.IsInRole(ApplicationRoles.Viewer))
                         {
                             <li class="nav-item">
-                                <a asp-controller="Audit" asp-action="Index" class="@NavClass("Audit")">
+                                <a asp-controller="Audit" asp-action="Index" class="@NavClass("Audit")" aria-current="@NavCurrent("Audit")">
                                     <span class="nav-icon" aria-hidden="true">AU</span>
                                     <p>Audit history</p>
                                 </a>
@@ -85,13 +90,13 @@
                         {
                             <li class="nav-header">Configuration</li>
                             <li class="nav-item">
-                                <a asp-controller="Categories" asp-action="Index" class="@NavClass("Categories")">
+                                <a asp-controller="Categories" asp-action="Index" class="@NavClass("Categories")" aria-current="@NavCurrent("Categories")">
                                     <span class="nav-icon" aria-hidden="true">CT</span>
                                     <p>Categories</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a asp-controller="Owners" asp-action="Index" class="@NavClass("Owners")">
+                                <a asp-controller="Owners" asp-action="Index" class="@NavClass("Owners")" aria-current="@NavCurrent("Owners")">
                                     <span class="nav-icon" aria-hidden="true">OW</span>
                                     <p>Owners</p>
                                 </a>
@@ -106,7 +111,7 @@
             </div>
         </aside>
 
-        <main class="app-main">
+        <main class="app-main" id="main-content" tabindex="-1">
             <div class="app-content-header">
                 <div class="container-fluid">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">

@@ -48,8 +48,8 @@
                                 <td>@category.DocumentCount</td>
                                 <td class="text-end text-nowrap">
                                     <a asp-action="Edit" asp-route-id="@category.PublicId" class="btn btn-outline-primary btn-sm">Edit</a>
-                                    <form asp-action="Toggle" asp-route-id="@category.PublicId" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-secondary btn-sm">@(category.IsActive ? "Deactivate" : "Reactivate")</button>
+                                    <form asp-action="Toggle" asp-route-id="@category.PublicId" method="post" class="d-inline" data-disable-on-submit>
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" data-submit-label="Updating...">@(category.IsActive ? "Deactivate" : "Reactivate")</button>
                                     </form>
                                     @if (category.DocumentCount == 0)
                                     {

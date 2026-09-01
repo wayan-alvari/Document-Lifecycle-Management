@@ -47,8 +47,8 @@
                                 <td>@owner.DocumentCount</td>
                                 <td class="text-end text-nowrap">
                                     <a asp-action="Edit" asp-route-id="@owner.PublicId" class="btn btn-outline-primary btn-sm">Edit</a>
-                                    <form asp-action="Toggle" asp-route-id="@owner.PublicId" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-secondary btn-sm">@(owner.IsActive ? "Deactivate" : "Reactivate")</button>
+                                    <form asp-action="Toggle" asp-route-id="@owner.PublicId" method="post" class="d-inline" data-disable-on-submit>
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" data-submit-label="Updating...">@(owner.IsActive ? "Deactivate" : "Reactivate")</button>
                                     </form>
                                     @if (owner.DocumentCount == 0)
                                     {

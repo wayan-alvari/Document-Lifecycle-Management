@@ -22,8 +22,8 @@ introduced.
 | PDFsharp / MigraDoc | 6.2.4 | MIT | <https://github.com/empira/PDFsharp> | PDF summary generation |
 | dotnet-ef | 8.0.30 | MIT | <https://github.com/dotnet/efcore> | Repository-local migration tool |
 | Microsoft.NET.Test.Sdk | 17.8.0 | MIT | <https://github.com/microsoft/vstest> | .NET test discovery and execution |
-| xUnit.net | 2.5.3 | Apache-2.0 | <https://github.com/xunit/xunit> | Unit and integration test framework |
-| xUnit.net Visual Studio runner | 2.5.3 | Apache-2.0 | <https://github.com/xunit/visualstudio.xunit> | Test runner adapter |
+| xUnit.net | 2.9.3 | Apache-2.0 | <https://github.com/xunit/xunit> | Unit and integration test framework |
+| xUnit.net Visual Studio runner | 2.8.2 | Apache-2.0 | <https://github.com/xunit/visualstudio.xunit> | Test runner adapter |
 | Coverlet collector | 6.0.0 | MIT | <https://github.com/coverlet-coverage/coverlet> | Cross-platform code coverage collection |
 
 The MIT License in `LICENSE` covers only original repository source. Each

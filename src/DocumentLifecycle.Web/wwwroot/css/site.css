@@ -26,6 +26,25 @@ a:hover {
   color: var(--dl-primary-dark);
 }
 
+.skip-link {
+  background: #fff;
+  border: 2px solid var(--dl-primary);
+  border-radius: 0.4rem;
+  color: var(--dl-primary-dark);
+  font-weight: 700;
+  left: 1rem;
+  padding: 0.65rem 0.9rem;
+  position: fixed;
+  top: 1rem;
+  transform: translateY(-200%);
+  transition: transform 120ms ease;
+  z-index: 2000;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 :focus-visible {
   outline: 3px solid #f6a800;
   outline-offset: 3px;

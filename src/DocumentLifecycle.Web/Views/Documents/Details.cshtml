@@ -18,8 +18,8 @@
         {
             <a asp-action="Edit" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Edit metadata</a>
             <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Upload revision</a>
-            <form asp-action="Activate" asp-route-id="@Model.PublicId" method="post">
-                <button type="submit" class="btn btn-primary" disabled="@(Model.Revisions.Count == 0)">Activate</button>
+            <form asp-action="Activate" asp-route-id="@Model.PublicId" method="post" data-disable-on-submit>
+                <button type="submit" class="btn btn-primary" disabled="@(Model.Revisions.Count == 0)" data-submit-label="Activating...">Activate</button>
             </form>
         }
         else if (canManage && Model.State == LifecycleState.Active)
@@ -29,8 +29,8 @@
         }
         else if (canManage && Model.State == LifecycleState.Archived)
         {
-            <form asp-action="Restore" asp-route-id="@Model.PublicId" method="post">
-                <button type="submit" class="btn btn-primary">Restore to active</button>
+            <form asp-action="Restore" asp-route-id="@Model.PublicId" method="post" data-disable-on-submit>
+                <button type="submit" class="btn btn-primary" data-submit-label="Restoring...">Restore to active</button>
             </form>
         }
     </div>
