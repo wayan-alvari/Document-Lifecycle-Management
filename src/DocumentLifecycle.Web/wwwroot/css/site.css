@@ -149,6 +149,32 @@ a:hover {
   width: 0.65rem;
 }
 
+.notification-summary {
+  align-items: center;
+  border: 1px solid #d8e0eb;
+  border-radius: 999px;
+  color: var(--dl-ink);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 700;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  text-decoration: none;
+}
+
+.notification-count {
+  align-items: center;
+  background: #c44343;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-size: 0.62rem;
+  height: 1.25rem;
+  justify-content: center;
+  min-width: 1.25rem;
+  padding-inline: 0.25rem;
+}
+
 .dashboard-intro {
   background: linear-gradient(120deg, #fff, #edf5ff);
   border: 1px solid #dce5f0;
@@ -521,6 +547,50 @@ a:hover {
   font-size: 0.75rem;
   font-weight: 700;
   margin-top: 0.35rem;
+}
+
+.notification-center {
+  border-radius: 1rem;
+}
+
+.notification-list li {
+  display: flex;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.notification-list li + li {
+  border-top: 1px solid #e5eaf1;
+}
+
+.notification-unread {
+  background: #f5f8ff;
+}
+
+.notification-state {
+  background: #9aa7b8;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  height: 0.65rem;
+  margin-top: 0.4rem;
+  width: 0.65rem;
+}
+
+.notification-unread .notification-state {
+  background: var(--dl-primary);
+  box-shadow: 0 0 0 4px rgb(35 87 217 / 12%);
+}
+
+.notification-list time,
+.read-label {
+  color: var(--dl-muted);
+  font-size: 0.72rem;
+}
+
+.read-label {
+  align-items: center;
+  display: inline-flex;
+  font-weight: 700;
 }
 
 .account-page {
