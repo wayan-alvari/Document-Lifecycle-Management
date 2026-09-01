@@ -29,4 +29,23 @@ internal sealed class WorkspaceUploadPathResolver(
 
         return workspacePath;
     }
+
+    public string GetFilePath(Guid workspaceId, string storedFilename)
+    {
+        if (string.IsNullOrWhiteSpace(storedFilename) ||
+            !string.Equals(storedFilename, Path.GetFileName(storedFilename), StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("The stored filename is not a safe leaf filename.");
+        }
+
+        var workspacePath = GetWorkspaceDirectory(workspaceId);
+        var filePath = Path.GetFullPath(Path.Combine(workspacePath, storedFilename));
+        var relativePath = Path.GetRelativePath(workspacePath, filePath);
+        if (relativePath.StartsWith("..", StringComparison.Ordinal) || Path.IsPathRooted(relativePath))
+        {
+            throw new InvalidOperationException("The stored file path is outside the workspace upload directory.");
+        }
+
+        return filePath;
+    }
 }

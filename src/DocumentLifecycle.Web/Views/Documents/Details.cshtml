@@ -16,10 +16,15 @@
     {
         <div class="d-flex flex-wrap gap-2">
             <a asp-action="Edit" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Edit metadata</a>
+            <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Upload revision</a>
             <form asp-action="Activate" asp-route-id="@Model.PublicId" method="post">
                 <button type="submit" class="btn btn-primary" disabled="@(Model.Revisions.Count == 0)">Activate</button>
             </form>
         </div>
+    }
+    else if (canManage && Model.State == LifecycleState.Active)
+    {
+        <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-primary">Upload revision</a>
     }
 </div>
 
@@ -77,6 +82,10 @@
                                     <strong>@revision.OriginalFilename</strong>
                                     <span class="d-block small text-body-secondary">@revision.ChangeNote</span>
                                     <span class="d-block revision-meta">@FormatSize(revision.Size) &middot; @revision.UploadedAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'")</span>
+                                    <a asp-action="Download"
+                                       asp-route-id="@Model.PublicId"
+                                       asp-route-revisionId="@revision.PublicId"
+                                       class="revision-download">Download revision</a>
                                 </div>
                             </li>
                         }

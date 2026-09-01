@@ -1,0 +1,43 @@
+@model DocumentLifecycle.Web.ViewModels.Documents.RevisionUploadPageViewModel
+@{
+    ViewData["Title"] = "Upload revision";
+}
+
+<div class="form-shell">
+    <a asp-action="Details" asp-route-id="@Model.Document.PublicId" class="back-link">&larr; Back to document</a>
+    <section class="card document-form-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow">@Model.Document.Code</span>
+            <h2 class="h4 mt-2">Upload revision @(Model.Document.Revisions.Count + 1)</h2>
+            <p class="text-body-secondary">
+                Choose a PDF, PNG, JPG, or JPEG file up to 10 MB. The extension,
+                declared media type, and binary signature must agree.
+            </p>
+            <form asp-action="UploadRevision"
+                  asp-route-id="@Model.Document.PublicId"
+                  method="post"
+                  enctype="multipart/form-data"
+                  data-disable-on-submit>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div class="mb-3">
+                    <label asp-for="Form.ChangeNote" class="form-label"></label>
+                    <textarea asp-for="Form.ChangeNote" class="form-control" rows="3" autofocus></textarea>
+                    <span asp-validation-for="Form.ChangeNote" class="text-danger"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Form.Upload" class="form-label"></label>
+                    <input asp-for="Form.Upload"
+                           class="form-control"
+                           type="file"
+                           accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" />
+                    <span asp-validation-for="Form.Upload" class="text-danger"></span>
+                    <div class="form-text">The original display name is sanitized; storage uses a random private filename.</div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary" data-submit-label="Uploading...">Upload revision</button>
+                    <a asp-action="Details" asp-route-id="@Model.Document.PublicId" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

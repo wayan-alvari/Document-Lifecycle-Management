@@ -2,6 +2,7 @@ using DocumentLifecycle.Application.Abstractions.Time;
 using DocumentLifecycle.Application.Abstractions.Workspaces;
 using DocumentLifecycle.Application.Dashboard;
 using DocumentLifecycle.Application.Documents;
+using DocumentLifecycle.Application.Files;
 using DocumentLifecycle.Application.ReferenceData;
 using DocumentLifecycle.Infrastructure.Dashboard;
 using DocumentLifecycle.Infrastructure.Documents;
@@ -41,6 +42,9 @@ public static class DependencyInjection
             .AddOptions<FileStorageOptions>()
             .Bind(configuration.GetSection(FileStorageOptions.SectionName))
             .Validate(options => !string.IsNullOrWhiteSpace(options.RootPath), "A file storage root is required.")
+            .Validate(
+                options => options.MaximumFileSizeBytes is > 0 and <= 10 * 1024 * 1024,
+                "The maximum file size must be between 1 byte and 10 MB.")
             .ValidateOnStart();
 
         services.AddDbContext<ApplicationDbContext>(options =>
@@ -96,6 +100,7 @@ public static class DependencyInjection
         services.AddScoped<DemoIdentitySeeder>();
         services.AddScoped<IDashboardQuery, DashboardQuery>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IDocumentFileService, DocumentFileService>();
         services.AddScoped<IReferenceDataService, ReferenceDataService>();
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<CurrentWorkspace>();

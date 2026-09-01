@@ -1,5 +1,6 @@
 using DocumentLifecycle.Application.Abstractions.Time;
 using DocumentLifecycle.Application.Documents;
+using DocumentLifecycle.Application.Files;
 using DocumentLifecycle.Application.Security;
 using DocumentLifecycle.Domain.Documents;
 using DocumentLifecycle.Web.ViewModels.Documents;
@@ -11,6 +12,7 @@ namespace DocumentLifecycle.Web.Controllers;
 [Authorize(Policy = AuthorizationPolicies.ViewDashboard)]
 public sealed class DocumentsController(
     IDocumentService documents,
+    IDocumentFileService documentFiles,
     IClock clock) : Controller
 {
     [HttpGet]
@@ -150,6 +152,98 @@ public sealed class DocumentsController(
         TempData[result.Status == DocumentMutationStatus.Rejected ? "ErrorMessage" : "StatusMessage"] =
             result.Message;
         return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ManageDocuments)]
+    [HttpGet]
+    public async Task<IActionResult> UploadRevision(Guid id, CancellationToken cancellationToken)
+    {
+        var document = await documents.GetDetailsAsync(id, includeDrafts: true, cancellationToken);
+        if (document is null)
+        {
+            return NotFound();
+        }
+
+        if (document.State == LifecycleState.Archived)
+        {
+            TempData["ErrorMessage"] = "Archived documents cannot receive a revision.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        return View(new RevisionUploadPageViewModel(document, new RevisionUploadViewModel()));
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ManageDocuments)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [RequestFormLimits(MultipartBodyLengthLimit = 11 * 1024 * 1024)]
+    [RequestSizeLimit(11 * 1024 * 1024)]
+    public async Task<IActionResult> UploadRevision(
+        Guid id,
+        [Bind(Prefix = nameof(RevisionUploadPageViewModel.Form))] RevisionUploadViewModel form,
+        CancellationToken cancellationToken)
+    {
+        var document = await documents.GetDetailsAsync(id, includeDrafts: true, cancellationToken);
+        if (document is null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid || form.Upload is null)
+        {
+            return View(new RevisionUploadPageViewModel(document, form));
+        }
+
+        await using var content = form.Upload.OpenReadStream();
+        var result = await documentFiles.UploadRevisionAsync(
+            id,
+            new RevisionUploadInput(
+                form.ChangeNote,
+                form.Upload.FileName,
+                form.Upload.ContentType,
+                form.Upload.Length,
+                content),
+            Actor,
+            cancellationToken);
+        if (result.Status == DocumentFileMutationStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        if (result.Status == DocumentFileMutationStatus.Rejected)
+        {
+            ModelState.AddModelError(string.Empty, result.Message!);
+            return View(new RevisionUploadPageViewModel(document, form with { Upload = null }));
+        }
+
+        TempData["StatusMessage"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Download(
+        Guid id,
+        Guid revisionId,
+        CancellationToken cancellationToken)
+    {
+        var download = await documentFiles.GetDownloadAsync(
+            id,
+            revisionId,
+            allowDraft: CanManage,
+            cancellationToken);
+        if (download is null)
+        {
+            return NotFound();
+        }
+
+        Response.Headers.XContentTypeOptions = "nosniff";
+        Response.Headers.CacheControl = "private, no-store";
+        Response.Headers.ETag = $"\"sha256-{download.Sha256Hash}\"";
+        return File(
+            download.Content,
+            download.MediaType,
+            download.DownloadFilename,
+            enableRangeProcessing: true);
     }
 
     private bool CanManage => User.IsInRole(ApplicationRoles.Administrator) ||
