@@ -17,6 +17,13 @@ var applicationArguments = args
     .Where(argument => !string.Equals(argument, "--initialize-demo", StringComparison.OrdinalIgnoreCase))
     .ToArray();
 var builder = WebApplication.CreateBuilder(applicationArguments);
+builder.Logging.ClearProviders();
+builder.Logging.AddJsonConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.TimestampFormat = "yyyy-MM-dd'T'HH:mm:ss.fff'Z'";
+    options.UseUtcTimestamp = true;
+});
 
 builder.Services.AddControllersWithViews(options =>
 {
