@@ -153,6 +153,32 @@ const location = await client.send("Runtime.evaluate", {
 if (location.result.value === "/Account/Login") {
   await closeBrowserAndThrow("Demo sign-in did not leave the login page.");
 }
+
+const themeResult = await client.send("Runtime.evaluate", {
+  expression: `(() => {
+    const rootStyle = getComputedStyle(document.documentElement);
+    const main = document.querySelector(".app-main");
+    const card = document.querySelector(".dashboard-panel, .card");
+    const overlay = document.querySelector(".sidebar-overlay");
+    return {
+      htmlTheme: document.documentElement.dataset.bsTheme ?? null,
+      bodyTheme: document.body.dataset.bsTheme ?? null,
+      bodyBackgroundVariable: rootStyle.getPropertyValue("--bs-body-bg").trim(),
+      bodyColorVariable: rootStyle.getPropertyValue("--bs-body-color").trim(),
+      mainBackground: main ? getComputedStyle(main).backgroundColor : null,
+      cardBackground: card ? getComputedStyle(card).backgroundColor : null,
+      overlayDisplay: overlay ? getComputedStyle(overlay).display : null,
+      overlayVisibility: overlay ? getComputedStyle(overlay).visibility : null,
+      bodyClasses: document.body.className,
+    };
+  })()`,
+  returnByValue: true,
+});
+const theme = themeResult.result.value;
+console.log(`Theme diagnostics: ${JSON.stringify(theme)}`);
+if (theme.htmlTheme !== "light" || theme.bodyBackgroundVariable !== "#fff") {
+  await closeBrowserAndThrow(`Expected the application shell to use the light theme: ${JSON.stringify(theme)}`);
+}
 await capture(client, "dashboard-desktop.png");
 
 await setViewport(client, 390, 844, true);

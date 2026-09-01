@@ -12,7 +12,7 @@
         StringComparison.OrdinalIgnoreCase) ? "page" : null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -158,8 +158,8 @@
     </div>
 
     <script src="~/vendor/bootstrap/bootstrap.bundle.min.js" defer></script>
-    <script src="~/vendor/adminlte/adminlte.min.js" defer></script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
+    <script src="~/vendor/adminlte/adminlte.min.js" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

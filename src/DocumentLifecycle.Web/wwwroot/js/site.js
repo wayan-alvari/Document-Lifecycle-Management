@@ -1,3 +1,12 @@
+const applicationTheme = "light";
+try {
+  localStorage.setItem("lte-theme", applicationTheme);
+} catch {
+  // The explicit document theme still works when browser storage is unavailable.
+}
+document.documentElement.setAttribute("data-bs-theme", applicationTheme);
+document.documentElement.style.colorScheme = applicationTheme;
+
 document.addEventListener("DOMContentLoaded", () => {
   const emailInput = document.querySelector("#Email");
   const passwordInput = document.querySelector("#Password");
