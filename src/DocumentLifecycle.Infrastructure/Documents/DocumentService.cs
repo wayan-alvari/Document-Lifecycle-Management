@@ -180,6 +180,19 @@ internal sealed class DocumentService(
         }
 
         var today = DateOnly.FromDateTime(clock.UtcNow);
+        var auditTrail = await database.AuditEvents
+            .AsNoTracking()
+            .Where(audit =>
+                audit.EntityType == nameof(ManagedDocument) &&
+                audit.EntityPublicId == document.PublicId)
+            .OrderByDescending(audit => audit.OccurredAtUtc)
+            .ThenByDescending(audit => audit.Id)
+            .Take(25)
+            .Select(audit => new DocumentAuditItem(
+                audit.Actor,
+                audit.Action,
+                audit.OccurredAtUtc))
+            .ToListAsync(cancellationToken);
         return new DocumentDetails(
             document.PublicId,
             document.Code,
@@ -209,7 +222,8 @@ internal sealed class DocumentService(
                     revision.Size,
                     revision.UploadedBy,
                     revision.UploadedAtUtc))
-                .ToList());
+                .ToList(),
+            auditTrail);
     }
 
     public async Task<DocumentMutationResult> CreateDraftAsync(
@@ -327,6 +341,75 @@ internal sealed class DocumentService(
         AddAudit(document, actor, "Activated", now);
         await database.SaveChangesAsync(cancellationToken);
         return DocumentMutationResult.Success(document.PublicId, $"{document.Code} activated.");
+    }
+
+    public async Task<DocumentMutationResult> ArchiveAsync(
+        Guid publicId,
+        string reason,
+        string actor,
+        CancellationToken cancellationToken = default)
+    {
+        var document = await database.ManagedDocuments.SingleOrDefaultAsync(
+            item => item.PublicId == publicId,
+            cancellationToken);
+        if (document is null)
+        {
+            return DocumentMutationResult.Missing();
+        }
+
+        var now = clock.UtcNow;
+        try
+        {
+            document.Archive(reason, actor, now);
+        }
+        catch (Exception exception) when (exception is DomainRuleException or ArgumentException)
+        {
+            return DocumentMutationResult.Reject(exception.Message);
+        }
+
+        database.AuditEvents.Add(AuditEvent.Create(
+            document.WorkspaceId,
+            actor,
+            "Archived",
+            nameof(ManagedDocument),
+            document.PublicId,
+            now,
+            JsonSerializer.Serialize(new
+            {
+                document.Code,
+                document.Title,
+                Reason = document.ArchiveReason,
+            })));
+        await database.SaveChangesAsync(cancellationToken);
+        return DocumentMutationResult.Success(document.PublicId, $"{document.Code} archived.");
+    }
+
+    public async Task<DocumentMutationResult> RestoreAsync(
+        Guid publicId,
+        string actor,
+        CancellationToken cancellationToken = default)
+    {
+        var document = await database.ManagedDocuments.SingleOrDefaultAsync(
+            item => item.PublicId == publicId,
+            cancellationToken);
+        if (document is null)
+        {
+            return DocumentMutationResult.Missing();
+        }
+
+        var now = clock.UtcNow;
+        try
+        {
+            document.Restore(actor, now);
+        }
+        catch (DomainRuleException exception)
+        {
+            return DocumentMutationResult.Reject(exception.Message);
+        }
+
+        AddAudit(document, actor, "Restored", now);
+        await database.SaveChangesAsync(cancellationToken);
+        return DocumentMutationResult.Success(document.PublicId, $"{document.Code} restored to active circulation.");
     }
 
     private async Task<(DocumentCategory Category, DocumentOwner Owner)?> ResolveReferencesAsync(

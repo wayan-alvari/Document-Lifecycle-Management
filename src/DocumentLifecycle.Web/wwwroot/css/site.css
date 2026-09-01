@@ -593,6 +593,56 @@ a:hover {
   font-weight: 700;
 }
 
+.document-timeline {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+
+.document-timeline li {
+  background: #f7f9fc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: auto 1fr;
+  padding: 0.9rem;
+}
+
+.document-timeline time {
+  color: var(--dl-muted);
+  font-size: 0.7rem;
+}
+
+.audit-card {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.audit-table th {
+  color: var(--dl-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.25rem;
+  text-transform: uppercase;
+}
+
+.audit-table td {
+  padding: 1rem 1.25rem;
+}
+
+.audit-action {
+  background: #eef2ff;
+  border-radius: 999px;
+  color: var(--dl-primary);
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
+}
+
 .account-page {
   background-image:
     radial-gradient(circle at 8% 8%, rgb(35 87 217 / 12%), transparent 30rem),
@@ -680,7 +730,9 @@ a:hover {
   .settings-table th,
   .settings-table td,
   .document-table th,
-  .document-table td {
+  .document-table td,
+  .audit-table th,
+  .audit-table td {
     padding-inline: 1rem;
   }
 

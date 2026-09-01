@@ -89,7 +89,8 @@ public sealed record DocumentDetails(
     string? ArchiveReason,
     string? ArchivedBy,
     DateTime? ArchivedAtUtc,
-    IReadOnlyList<DocumentRevisionItem> Revisions);
+    IReadOnlyList<DocumentRevisionItem> Revisions,
+    IReadOnlyList<DocumentAuditItem> AuditTrail);
 
 public sealed record DocumentRevisionItem(
     Guid PublicId,
@@ -100,6 +101,11 @@ public sealed record DocumentRevisionItem(
     long Size,
     string UploadedBy,
     DateTime UploadedAtUtc);
+
+public sealed record DocumentAuditItem(
+    string Actor,
+    string Action,
+    DateTime OccurredAtUtc);
 
 public enum DocumentMutationStatus
 {

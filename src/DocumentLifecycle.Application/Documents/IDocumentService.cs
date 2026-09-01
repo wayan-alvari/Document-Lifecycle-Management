@@ -33,4 +33,15 @@ public interface IDocumentService
         Guid publicId,
         string actor,
         CancellationToken cancellationToken = default);
+
+    Task<DocumentMutationResult> ArchiveAsync(
+        Guid publicId,
+        string reason,
+        string actor,
+        CancellationToken cancellationToken = default);
+
+    Task<DocumentMutationResult> RestoreAsync(
+        Guid publicId,
+        string actor,
+        CancellationToken cancellationToken = default);
 }

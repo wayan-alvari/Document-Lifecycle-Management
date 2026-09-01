@@ -1,0 +1,118 @@
+@model DocumentLifecycle.Web.ViewModels.Audit.AuditListViewModel
+@{
+    ViewData["Title"] = "Audit history";
+}
+
+<div class="mb-4">
+    <span class="eyebrow">Workspace history</span>
+    <h2 class="h4 mt-2 mb-1">Audit events</h2>
+    <p class="text-body-secondary mb-0">Search safe workflow summaries. File content, hashes, secrets, and cookies are never recorded here.</p>
+</div>
+
+<section class="card filter-card border-0 shadow-sm mb-4" aria-labelledby="audit-filter-heading">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" id="audit-filter-heading">Filter audit history</h2>
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-6">
+                    <label for="Search" class="form-label">Search</label>
+                    <input id="Search" name="Search" value="@Model.Query.Search" class="form-control" placeholder="Actor, action, code, title, or label" />
+                </div>
+                <div class="col-lg-3">
+                    <label for="EventAction" class="form-label">Action</label>
+                    <select id="EventAction" name="EventAction" class="form-select">
+                        <option value="">All actions</option>
+                        @foreach (var action in Model.Results.AvailableActions)
+                        {
+                            <option value="@action" selected="@(action == Model.Query.EventAction)">@Humanize(action)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Apply filters</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="card audit-card border-0 shadow-sm" aria-labelledby="audit-list-heading">
+    <div class="card-header bg-white border-0 d-flex justify-content-between gap-3 p-4 pb-2">
+        <h2 class="h5 mb-0" id="audit-list-heading">Recorded events</h2>
+        <span class="count-chip">@Model.Results.TotalCount found</span>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Results.Items.Count == 0)
+        {
+            <div class="empty-state m-4">
+                <strong>No audit events match</strong>
+                <span>Clear or change the filters and try again.</span>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table audit-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">When</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">Safe summary</th>
+                            <th scope="col">Actor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var audit in Model.Results.Items)
+                        {
+                            <tr>
+                                <td><time datetime="@audit.OccurredAtUtc.ToString("O")">@audit.OccurredAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'")</time></td>
+                                <td><span class="audit-action">@Humanize(audit.Action)</span></td>
+                                <td>@audit.Summary</td>
+                                <td>@audit.Actor</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+    @if (Model.Results.TotalPages > 1)
+    {
+        <div class="card-footer bg-white border-0 p-4">
+            <nav aria-label="Audit result pages">
+                <ul class="pagination mb-0">
+                    @for (var pageNumber = 1; pageNumber <= Model.Results.TotalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.Results.Page ? "active" : string.Empty)">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-Search="@Model.Query.Search"
+                               asp-route-EventAction="@Model.Query.EventAction"
+                               asp-route-Page="@pageNumber">@pageNumber</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+</section>
+
+@functions {
+    private static string Humanize(string value) => value switch
+    {
+        "RevisionUploaded" => "Revision uploaded",
+        "DraftUpdated" => "Draft updated",
+        "CategoryCreated" => "Category created",
+        "CategoryUpdated" => "Category updated",
+        "CategoryDeactivated" => "Category deactivated",
+        "CategoryReactivated" => "Category reactivated",
+        "CategoryDeleted" => "Category deleted",
+        "OwnerCreated" => "Owner created",
+        "OwnerUpdated" => "Owner updated",
+        "OwnerDeactivated" => "Owner deactivated",
+        "OwnerReactivated" => "Owner reactivated",
+        "OwnerDeleted" => "Owner deleted",
+        _ => value,
+    };
+}

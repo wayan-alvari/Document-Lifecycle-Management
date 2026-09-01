@@ -1,0 +1,31 @@
+@model DocumentLifecycle.Web.ViewModels.Documents.ArchiveDocumentPageViewModel
+@{
+    ViewData["Title"] = "Archive document";
+}
+
+<div class="form-shell">
+    <a asp-action="Details" asp-route-id="@Model.Document.PublicId" class="back-link">&larr; Back to document</a>
+    <section class="card document-form-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow text-danger">Remove from active circulation</span>
+            <h2 class="h4 mt-2">Archive @Model.Document.Code?</h2>
+            <p class="text-body-secondary">
+                <strong>@Model.Document.Title</strong> will retain its revision history and audit trail.
+                It can be restored later.
+            </p>
+            <form asp-action="Archive" asp-route-id="@Model.Document.PublicId" method="post" data-disable-on-submit>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                <div class="mb-4">
+                    <label asp-for="Form.Reason" class="form-label"></label>
+                    <textarea asp-for="Form.Reason" class="form-control" rows="4" autofocus></textarea>
+                    <span asp-validation-for="Form.Reason" class="text-danger"></span>
+                    <div class="form-text">The reason is retained in the safe audit summary.</div>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-danger" data-submit-label="Archiving...">Archive document</button>
+                    <a asp-action="Details" asp-route-id="@Model.Document.PublicId" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

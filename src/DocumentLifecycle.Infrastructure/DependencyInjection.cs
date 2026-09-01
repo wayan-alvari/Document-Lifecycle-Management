@@ -1,11 +1,13 @@
 using DocumentLifecycle.Application.Abstractions.Time;
 using DocumentLifecycle.Application.Abstractions.Workspaces;
+using DocumentLifecycle.Application.Audit;
 using DocumentLifecycle.Application.Dashboard;
 using DocumentLifecycle.Application.Documents;
 using DocumentLifecycle.Application.Files;
 using DocumentLifecycle.Application.Notifications;
 using DocumentLifecycle.Application.ReferenceData;
 using DocumentLifecycle.Infrastructure.Dashboard;
+using DocumentLifecycle.Infrastructure.Audit;
 using DocumentLifecycle.Infrastructure.Documents;
 using DocumentLifecycle.Infrastructure.Files;
 using DocumentLifecycle.Infrastructure.Identity;
@@ -100,6 +102,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<DemoIdentitySeeder>();
+        services.AddScoped<IAuditQuery, AuditQuery>();
         services.AddScoped<IDashboardQuery, DashboardQuery>();
         services.AddScoped<IDocumentService, DocumentService>();
         services.AddScoped<IDocumentFileService, DocumentFileService>();

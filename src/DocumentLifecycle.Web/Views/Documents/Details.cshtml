@@ -24,7 +24,16 @@
     }
     else if (canManage && Model.State == LifecycleState.Active)
     {
-        <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-primary">Upload revision</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="UploadRevision" asp-route-id="@Model.PublicId" class="btn btn-primary">Upload revision</a>
+            <a asp-action="Archive" asp-route-id="@Model.PublicId" class="btn btn-outline-danger">Archive</a>
+        </div>
+    }
+    else if (canManage && Model.State == LifecycleState.Archived)
+    {
+        <form asp-action="Restore" asp-route-id="@Model.PublicId" method="post">
+            <button type="submit" class="btn btn-primary">Restore to active</button>
+        </form>
     }
 </div>
 
@@ -52,6 +61,13 @@
                     <dd>@Model.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'") by @Model.CreatedBy</dd>
                     <dt>Last updated</dt>
                     <dd>@Model.UpdatedAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'") by @Model.UpdatedBy</dd>
+                    @if (Model.State == LifecycleState.Archived)
+                    {
+                        <dt>Archive reason</dt>
+                        <dd>@Model.ArchiveReason</dd>
+                        <dt>Archived</dt>
+                        <dd>@Model.ArchivedAtUtc?.ToString("dd MMM yyyy, HH:mm 'UTC'") by @Model.ArchivedBy</dd>
+                    }
                 </dl>
             </div>
         </div>
@@ -96,6 +112,28 @@
     </section>
 </div>
 
+<section class="card document-detail-card border-0 shadow-sm mt-4" aria-labelledby="timeline-heading">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between gap-3 mb-3">
+            <h2 class="h5 mb-0" id="timeline-heading">Document activity</h2>
+            <span class="count-chip">@Model.AuditTrail.Count events</span>
+        </div>
+        <ol class="document-timeline list-unstyled mb-0">
+            @foreach (var audit in Model.AuditTrail)
+            {
+                <li>
+                    <span class="activity-marker" aria-hidden="true"></span>
+                    <div>
+                        <strong>@Humanize(audit.Action)</strong>
+                        <span class="d-block small text-body-secondary">@audit.Actor</span>
+                        <time datetime="@audit.OccurredAtUtc.ToString("O")">@audit.OccurredAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'")</time>
+                    </div>
+                </li>
+            }
+        </ol>
+    </div>
+</section>
+
 @functions {
     private static string StatusLabel(DocumentDisplayStatus status) => status == DocumentDisplayStatus.ExpiringSoon
         ? "Expiring soon"
@@ -108,4 +146,11 @@
     private static string FormatSize(long size) => size < 1024
         ? $"{size} B"
         : $"{Math.Ceiling(size / 1024d):0} KB";
+
+    private static string Humanize(string value) => value switch
+    {
+        "RevisionUploaded" => "Revision uploaded",
+        "DraftUpdated" => "Draft updated",
+        _ => value,
+    };
 }

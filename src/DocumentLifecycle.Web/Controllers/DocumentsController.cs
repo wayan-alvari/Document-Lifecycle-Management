@@ -246,6 +246,78 @@ public sealed class DocumentsController(
             enableRangeProcessing: true);
     }
 
+    [Authorize(Policy = AuthorizationPolicies.ManageDocuments)]
+    [HttpGet]
+    public async Task<IActionResult> Archive(Guid id, CancellationToken cancellationToken)
+    {
+        var document = await documents.GetDetailsAsync(id, includeDrafts: true, cancellationToken);
+        if (document is null)
+        {
+            return NotFound();
+        }
+
+        if (document.State != LifecycleState.Active)
+        {
+            TempData["ErrorMessage"] = "Only active documents can be archived.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        return View(new ArchiveDocumentPageViewModel(
+            document,
+            new ArchiveDocumentFormViewModel()));
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ManageDocuments)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Archive(
+        Guid id,
+        [Bind(Prefix = nameof(ArchiveDocumentPageViewModel.Form))] ArchiveDocumentFormViewModel form,
+        CancellationToken cancellationToken)
+    {
+        var document = await documents.GetDetailsAsync(id, includeDrafts: true, cancellationToken);
+        if (document is null)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(new ArchiveDocumentPageViewModel(document, form));
+        }
+
+        var result = await documents.ArchiveAsync(id, form.Reason, Actor, cancellationToken);
+        if (result.Status == DocumentMutationStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        if (result.Status == DocumentMutationStatus.Rejected)
+        {
+            ModelState.AddModelError(string.Empty, result.Message!);
+            return View(new ArchiveDocumentPageViewModel(document, form));
+        }
+
+        TempData["StatusMessage"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
+    [Authorize(Policy = AuthorizationPolicies.ManageDocuments)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Restore(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await documents.RestoreAsync(id, Actor, cancellationToken);
+        if (result.Status == DocumentMutationStatus.NotFound)
+        {
+            return NotFound();
+        }
+
+        TempData[result.Status == DocumentMutationStatus.Rejected ? "ErrorMessage" : "StatusMessage"] =
+            result.Message;
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
     private bool CanManage => User.IsInRole(ApplicationRoles.Administrator) ||
         User.IsInRole(ApplicationRoles.DocumentManager);
 

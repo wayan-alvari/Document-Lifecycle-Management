@@ -72,6 +72,15 @@
                                 <p>Notifications</p>
                             </a>
                         </li>
+                        @if (User.IsInRole(ApplicationRoles.Administrator) || User.IsInRole(ApplicationRoles.Viewer))
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Audit" asp-action="Index" class="@NavClass("Audit")">
+                                    <span class="nav-icon" aria-hidden="true">AU</span>
+                                    <p>Audit history</p>
+                                </a>
+                            </li>
+                        }
                         @if (User.IsInRole(ApplicationRoles.Administrator))
                         {
                             <li class="nav-header">Configuration</li>
