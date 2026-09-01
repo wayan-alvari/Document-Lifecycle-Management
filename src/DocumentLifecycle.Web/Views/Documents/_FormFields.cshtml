@@ -1,0 +1,49 @@
+@model DocumentLifecycle.Web.ViewModels.Documents.DocumentFormPageViewModel
+
+<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+<div class="mb-3">
+    <label asp-for="Form.Title" class="form-label"></label>
+    <input asp-for="Form.Title" class="form-control" autocomplete="off" autofocus />
+    <span asp-validation-for="Form.Title" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Form.Description" class="form-label"></label>
+    <textarea asp-for="Form.Description" class="form-control" rows="5"></textarea>
+    <span asp-validation-for="Form.Description" class="text-danger"></span>
+</div>
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <label asp-for="Form.CategoryId" class="form-label"></label>
+        <select asp-for="Form.CategoryId" class="form-select">
+            <option value="">Choose a category</option>
+            @foreach (var category in Model.Options.Categories.Where(item => item.IsActive || item.PublicId == Model.Form.CategoryId))
+            {
+                <option value="@category.PublicId">@category.Label@(!category.IsActive ? " (inactive)" : string.Empty)</option>
+            }
+        </select>
+        <span asp-validation-for="Form.CategoryId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Form.OwnerId" class="form-label"></label>
+        <select asp-for="Form.OwnerId" class="form-select">
+            <option value="">Choose an owner</option>
+            @foreach (var owner in Model.Options.Owners.Where(item => item.IsActive || item.PublicId == Model.Form.OwnerId))
+            {
+                <option value="@owner.PublicId">@owner.Label@(!owner.IsActive ? " (inactive)" : string.Empty)</option>
+            }
+        </select>
+        <span asp-validation-for="Form.OwnerId" class="text-danger"></span>
+    </div>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <label asp-for="Form.EffectiveDate" class="form-label"></label>
+        <input asp-for="Form.EffectiveDate" class="form-control" />
+        <span asp-validation-for="Form.EffectiveDate" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Form.ExpiryDate" class="form-label"></label>
+        <input asp-for="Form.ExpiryDate" class="form-control" />
+        <span asp-validation-for="Form.ExpiryDate" class="text-danger"></span>
+    </div>
+</div>

@@ -405,6 +405,117 @@ a:hover {
   text-decoration: none;
 }
 
+.filter-card,
+.document-list-card,
+.document-form-card,
+.document-detail-card {
+  border-radius: 1rem;
+}
+
+.document-list-card {
+  overflow: hidden;
+}
+
+.document-table th {
+  color: var(--dl-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1.25rem;
+  text-transform: uppercase;
+}
+
+.document-table td {
+  padding: 1rem 1.25rem;
+}
+
+.status-badge {
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.55rem;
+  white-space: nowrap;
+}
+
+.status-draft {
+  background: #f1f3f6;
+  color: #586679;
+}
+
+.status-active {
+  background: #e8f7f1;
+  color: #14634f;
+}
+
+.status-expiring {
+  background: #fff5dc;
+  color: #805200;
+}
+
+.status-expired {
+  background: #ffeded;
+  color: #9b3030;
+}
+
+.status-archived {
+  background: #f2edff;
+  color: #5c4090;
+}
+
+.document-description {
+  color: var(--dl-muted);
+  line-height: 1.7;
+  margin-block: 1rem 1.5rem;
+  white-space: pre-line;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 0.65rem 1.25rem;
+  grid-template-columns: minmax(8rem, 0.45fr) 1fr;
+}
+
+.detail-grid dt {
+  color: var(--dl-muted);
+  font-size: 0.78rem;
+}
+
+.detail-grid dd {
+  margin: 0;
+}
+
+.revision-list li {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: auto 1fr;
+  padding-block: 0.75rem;
+}
+
+.revision-list li + li {
+  border-top: 1px solid #e4e9f0;
+}
+
+.revision-number {
+  align-items: center;
+  background: #eef2ff;
+  border-radius: 0.5rem;
+  color: var(--dl-primary);
+  display: inline-flex;
+  font-size: 0.72rem;
+  font-weight: 800;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.revision-meta {
+  color: var(--dl-muted);
+  font-size: 0.7rem;
+  margin-top: 0.2rem;
+}
+
 .account-page {
   background-image:
     radial-gradient(circle at 8% 8%, rgb(35 87 217 / 12%), transparent 30rem),
@@ -490,8 +601,18 @@ a:hover {
   .dashboard-table th,
   .dashboard-table td,
   .settings-table th,
-  .settings-table td {
+  .settings-table td,
+  .document-table th,
+  .document-table td {
     padding-inline: 1rem;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid dd:not(:last-child) {
+    margin-bottom: 0.5rem;
   }
 }
 

@@ -1,0 +1,22 @@
+@model DocumentLifecycle.Web.ViewModels.Documents.DocumentFormPageViewModel
+@{
+    ViewData["Title"] = "Edit draft";
+}
+
+<div class="form-shell">
+    <a asp-action="Details" asp-route-id="@Model.PublicId" class="back-link">&larr; Back to document</a>
+    <section class="card document-form-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow">@Model.Code</span>
+            <h2 class="h4 mt-2">Edit draft metadata</h2>
+            <p class="text-body-secondary">Active or archived document metadata cannot be changed through this form.</p>
+            <form asp-action="Edit" asp-route-id="@Model.PublicId" method="post" data-disable-on-submit>
+                <partial name="_FormFields" model="Model" />
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary" data-submit-label="Saving...">Save draft</button>
+                    <a asp-action="Details" asp-route-id="@Model.PublicId" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

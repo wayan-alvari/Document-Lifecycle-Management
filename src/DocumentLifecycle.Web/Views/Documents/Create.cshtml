@@ -1,0 +1,22 @@
+@model DocumentLifecycle.Web.ViewModels.Documents.DocumentFormPageViewModel
+@{
+    ViewData["Title"] = "Create document";
+}
+
+<div class="form-shell">
+    <a asp-action="Index" class="back-link">&larr; Back to documents</a>
+    <section class="card document-form-card border-0 shadow-sm mt-3">
+        <div class="card-body p-4 p-lg-5">
+            <span class="eyebrow">New draft</span>
+            <h2 class="h4 mt-2">Create document metadata</h2>
+            <p class="text-body-secondary">A public-safe document code is generated automatically. Upload a revision before activation.</p>
+            <form asp-action="Create" method="post" data-disable-on-submit>
+                <partial name="_FormFields" model="Model" />
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary" data-submit-label="Creating...">Create draft</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>

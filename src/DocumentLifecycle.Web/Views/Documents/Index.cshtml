@@ -1,0 +1,167 @@
+@model DocumentLifecycle.Web.ViewModels.Documents.DocumentListViewModel
+@using DocumentLifecycle.Application.Documents
+@{
+    ViewData["Title"] = "Documents";
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+        <span class="eyebrow">Lifecycle register</span>
+        <h2 class="h4 mt-2 mb-1">Documents</h2>
+        <p class="text-body-secondary mb-0">Search and filter this browser's workspace using server-side queries.</p>
+    </div>
+    @if (Model.CanManageDocuments)
+    {
+        <a asp-action="Create" class="btn btn-primary">Create draft</a>
+    }
+</div>
+
+<section class="card filter-card border-0 shadow-sm mb-4" aria-labelledby="filter-heading">
+    <div class="card-body p-4">
+        <h2 class="h6 mb-3" id="filter-heading">Filter documents</h2>
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-4">
+                    <label for="Search" class="form-label">Search</label>
+                    <input id="Search" name="Search" value="@Model.Query.Search" class="form-control" placeholder="Code, title, or description" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label for="Status" class="form-label">Lifecycle status</label>
+                    <select id="Status" name="Status" class="form-select">
+                        @foreach (var status in Enum.GetValues<DocumentListStatus>())
+                        {
+                            <option value="@status" selected="@(status == Model.Query.Status)">@StatusLabel(status)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="CategoryId" class="form-label">Category</label>
+                    <select id="CategoryId" name="CategoryId" class="form-select">
+                        <option value="">All categories</option>
+                        @foreach (var category in Model.Options.Categories)
+                        {
+                            <option value="@category.PublicId" selected="@(category.PublicId == Model.Query.CategoryId)">@category.Label</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="OwnerId" class="form-label">Owner</label>
+                    <select id="OwnerId" name="OwnerId" class="form-select">
+                        <option value="">All owners</option>
+                        @foreach (var owner in Model.Options.Owners)
+                        {
+                            <option value="@owner.PublicId" selected="@(owner.PublicId == Model.Query.OwnerId)">@owner.Label</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="ExpiryFrom" class="form-label">Review date from</label>
+                    <input id="ExpiryFrom" name="ExpiryFrom" type="date" value="@Model.Query.ExpiryFrom?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <label for="ExpiryTo" class="form-label">Review date to</label>
+                    <input id="ExpiryTo" name="ExpiryTo" type="date" value="@Model.Query.ExpiryTo?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-lg-6 d-flex flex-wrap gap-2">
+                    <button type="submit" class="btn btn-primary">Apply filters</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="card document-list-card border-0 shadow-sm" aria-labelledby="document-list-heading">
+    <div class="card-header bg-white border-0 d-flex justify-content-between gap-3 p-4 pb-2">
+        <h2 class="h5 mb-0" id="document-list-heading">Results</h2>
+        <span class="count-chip">@Model.Results.TotalCount found</span>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Results.Items.Count == 0)
+        {
+            <div class="empty-state m-4">
+                <strong>No documents match</strong>
+                <span>Clear or change the filters and try again.</span>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table document-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Document</th>
+                            <th scope="col">Category / owner</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Review date</th>
+                            <th scope="col">Revisions</th>
+                            <th scope="col"><span class="visually-hidden">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var document in Model.Results.Items)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="document-code">@document.Code</span>
+                                    <strong class="d-block">@document.Title</strong>
+                                </td>
+                                <td>
+                                    @document.Category
+                                    <span class="d-block small text-body-secondary">@document.Owner</span>
+                                </td>
+                                <td><span class="status-badge status-@StatusClass(document.DisplayStatus)">@StatusLabel(document.DisplayStatus)</span></td>
+                                <td>@(document.ExpiryDate?.ToString("dd MMM yyyy") ?? "Not scheduled")</td>
+                                <td>@document.RevisionCount</td>
+                                <td class="text-end"><a asp-action="Details" asp-route-id="@document.PublicId" class="btn btn-outline-primary btn-sm">View</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+    @if (Model.Results.TotalPages > 1)
+    {
+        <div class="card-footer bg-white border-0 p-4">
+            <nav aria-label="Document result pages">
+                <ul class="pagination mb-0">
+                    @for (var pageNumber = 1; pageNumber <= Model.Results.TotalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.Results.Page ? "active" : string.Empty)">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-Search="@Model.Query.Search"
+                               asp-route-Status="@Model.Query.Status"
+                               asp-route-CategoryId="@Model.Query.CategoryId"
+                               asp-route-OwnerId="@Model.Query.OwnerId"
+                               asp-route-ExpiryFrom="@Model.Query.ExpiryFrom"
+                               asp-route-ExpiryTo="@Model.Query.ExpiryTo"
+                               asp-route-Page="@pageNumber">@pageNumber</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+</section>
+
+@functions {
+    private static string StatusLabel(DocumentListStatus status) => status switch
+    {
+        DocumentListStatus.ExpiringSoon => "Expiring soon",
+        _ => status.ToString(),
+    };
+
+    private static string StatusLabel(DocumentLifecycle.Domain.Documents.DocumentDisplayStatus status) => status switch
+    {
+        DocumentLifecycle.Domain.Documents.DocumentDisplayStatus.ExpiringSoon => "Expiring soon",
+        _ => status.ToString(),
+    };
+
+    private static string StatusClass(DocumentLifecycle.Domain.Documents.DocumentDisplayStatus status) => status switch
+    {
+        DocumentLifecycle.Domain.Documents.DocumentDisplayStatus.ExpiringSoon => "expiring",
+        _ => status.ToString().ToLowerInvariant(),
+    };
+}

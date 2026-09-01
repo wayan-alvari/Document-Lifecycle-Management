@@ -103,6 +103,55 @@ public sealed class ManagedDocumentTests
         Assert.Equal([1, 2, 3], document.Revisions.Select(revision => revision.RevisionNumber));
     }
 
+    [Fact]
+    public void DraftMetadataCanBeUpdatedButActiveMetadataCannot()
+    {
+        var document = CreateDraft();
+
+        document.UpdateDraftMetadata(
+            "Updated fictional document",
+            "Updated synthetic description",
+            categoryId: 2,
+            ownerId: 3,
+            Today,
+            Today.AddDays(20),
+            "manager",
+            UtcNow.AddMinutes(1));
+
+        Assert.Equal("Updated fictional document", document.Title);
+        Assert.Equal(2, document.CategoryId);
+        Assert.Equal(3, document.OwnerId);
+        Assert.Equal(Today.AddDays(20), document.ExpiryDate);
+
+        AddRevision(document);
+        document.Activate("manager", UtcNow.AddMinutes(2));
+        Assert.Throws<DomainRuleException>(() => document.UpdateDraftMetadata(
+            "Rejected update",
+            string.Empty,
+            1,
+            1,
+            Today,
+            null,
+            "manager",
+            UtcNow.AddMinutes(3)));
+    }
+
+    [Fact]
+    public void DraftMetadataRejectsExpiryBeforeEffectiveDate()
+    {
+        var document = CreateDraft();
+
+        Assert.Throws<ArgumentException>(() => document.UpdateDraftMetadata(
+            "Fictional document",
+            string.Empty,
+            1,
+            1,
+            Today,
+            Today.AddDays(-1),
+            "manager",
+            UtcNow));
+    }
+
     private static ManagedDocument CreateDraft(DateOnly? expiryDate = null) =>
         ManagedDocument.CreateDraft(
             WorkspaceId,

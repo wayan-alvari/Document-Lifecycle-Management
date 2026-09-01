@@ -57,6 +57,12 @@
                                 <p>Lifecycle dashboard</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a asp-controller="Documents" asp-action="Index" class="@NavClass("Documents")">
+                                <span class="nav-icon" aria-hidden="true">DC</span>
+                                <p>Documents</p>
+                            </a>
+                        </li>
                         @if (User.IsInRole(ApplicationRoles.Administrator))
                         {
                             <li class="nav-header">Configuration</li>

@@ -154,6 +154,45 @@ public sealed class ManagedDocument : IWorkspaceScoped
         return revision;
     }
 
+    public void UpdateDraftMetadata(
+        string title,
+        string description,
+        long categoryId,
+        long ownerId,
+        DateOnly effectiveDate,
+        DateOnly? expiryDate,
+        string actor,
+        DateTime utcNow)
+    {
+        if (State != LifecycleState.Draft)
+        {
+            throw new DomainRuleException("Only draft document metadata can be edited.");
+        }
+
+        if (categoryId < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(categoryId));
+        }
+
+        if (ownerId < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(ownerId));
+        }
+
+        if (expiryDate is not null && expiryDate < effectiveDate)
+        {
+            throw new ArgumentException("Expiry date cannot precede the effective date.", nameof(expiryDate));
+        }
+
+        Title = Required(title, nameof(title), 200);
+        Description = Optional(description, 2000);
+        CategoryId = categoryId;
+        OwnerId = ownerId;
+        EffectiveDate = effectiveDate;
+        ExpiryDate = expiryDate;
+        MarkUpdated(actor, utcNow);
+    }
+
     public void Activate(string actor, DateTime utcNow)
     {
         if (State != LifecycleState.Draft)

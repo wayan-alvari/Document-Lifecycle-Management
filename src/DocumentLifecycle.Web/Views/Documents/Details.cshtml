@@ -1,0 +1,102 @@
+@model DocumentLifecycle.Application.Documents.DocumentDetails
+@using DocumentLifecycle.Domain.Documents
+@{
+    ViewData["Title"] = Model.Code;
+    var canManage = ViewData["CanManageDocuments"] as bool? == true;
+}
+
+<div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between gap-3 mb-4">
+    <div>
+        <a asp-action="Index" class="back-link">&larr; Back to documents</a>
+        <span class="document-code d-block mt-3">@Model.Code</span>
+        <h2 class="h3 mt-1 mb-2">@Model.Title</h2>
+        <span class="status-badge status-@StatusClass(Model.DisplayStatus)">@StatusLabel(Model.DisplayStatus)</span>
+    </div>
+    @if (canManage && Model.State == LifecycleState.Draft)
+    {
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.PublicId" class="btn btn-outline-primary">Edit metadata</a>
+            <form asp-action="Activate" asp-route-id="@Model.PublicId" method="post">
+                <button type="submit" class="btn btn-primary" disabled="@(Model.Revisions.Count == 0)">Activate</button>
+            </form>
+        </div>
+    }
+</div>
+
+@if (Model.State == LifecycleState.Draft && Model.Revisions.Count == 0)
+{
+    <div class="alert alert-warning" role="status">Upload at least one valid revision before activation.</div>
+}
+
+<div class="row g-4">
+    <section class="col-lg-7" aria-labelledby="metadata-heading">
+        <div class="card document-detail-card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h2 class="h5" id="metadata-heading">Document metadata</h2>
+                <p class="document-description">@Model.Description</p>
+                <dl class="detail-grid mb-0">
+                    <dt>Category</dt>
+                    <dd>@Model.Category</dd>
+                    <dt>Owner</dt>
+                    <dd>@Model.Owner</dd>
+                    <dt>Effective date</dt>
+                    <dd>@Model.EffectiveDate.ToString("dd MMM yyyy")</dd>
+                    <dt>Review date</dt>
+                    <dd>@(Model.ExpiryDate?.ToString("dd MMM yyyy") ?? "Not scheduled")</dd>
+                    <dt>Created</dt>
+                    <dd>@Model.CreatedAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'") by @Model.CreatedBy</dd>
+                    <dt>Last updated</dt>
+                    <dd>@Model.UpdatedAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'") by @Model.UpdatedBy</dd>
+                </dl>
+            </div>
+        </div>
+    </section>
+
+    <section class="col-lg-5" aria-labelledby="revision-heading">
+        <div class="card document-detail-card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between gap-3 mb-3">
+                    <h2 class="h5 mb-0" id="revision-heading">Revision history</h2>
+                    <span class="count-chip">@Model.Revisions.Count</span>
+                </div>
+                @if (Model.Revisions.Count == 0)
+                {
+                    <div class="empty-state">
+                        <strong>No revision uploaded</strong>
+                        <span>A document must have a valid file before activation.</span>
+                    </div>
+                }
+                else
+                {
+                    <ol class="revision-list list-unstyled mb-0">
+                        @foreach (var revision in Model.Revisions)
+                        {
+                            <li>
+                                <span class="revision-number">v@revision.RevisionNumber</span>
+                                <div>
+                                    <strong>@revision.OriginalFilename</strong>
+                                    <span class="d-block small text-body-secondary">@revision.ChangeNote</span>
+                                    <span class="d-block revision-meta">@FormatSize(revision.Size) &middot; @revision.UploadedAtUtc.ToString("dd MMM yyyy, HH:mm 'UTC'")</span>
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@functions {
+    private static string StatusLabel(DocumentDisplayStatus status) => status == DocumentDisplayStatus.ExpiringSoon
+        ? "Expiring soon"
+        : status.ToString();
+
+    private static string StatusClass(DocumentDisplayStatus status) => status == DocumentDisplayStatus.ExpiringSoon
+        ? "expiring"
+        : status.ToString().ToLowerInvariant();
+
+    private static string FormatSize(long size) => size < 1024
+        ? $"{size} B"
+        : $"{Math.Ceiling(size / 1024d):0} KB";
+}
